@@ -1,0 +1,51 @@
+# Build output
+bin/
+obj/
+Debug/
+Release/
+x64/
+Win32/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+# Executables / compiled objects / libraries
+*.exe
+*.out
+*.o
+*.obj
+*.dll
+*.a
+*.so
+*.dylib
+
+# IDE / generated metadata
+*.layout
+*.depend
+*.cbp.save
+
+# Logs / temp
+*.log
+*.tmp
+*.bak
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Big third-party source trees and extras
+common/freeglut/
+common/assimp/
+common/glew/bin/
+common/glew/doc/
+
+# Archives
+*.zip
+*.7z
+*.rar
