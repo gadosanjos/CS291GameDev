@@ -15,13 +15,11 @@ Win32/
 *.out
 *.o
 *.obj
-*.dll
 *.a
 *.so
 *.dylib
 
 # IDE / generated metadata
-*.layout
 *.depend
 *.cbp.save
 
