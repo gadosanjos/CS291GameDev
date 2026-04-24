@@ -15,9 +15,6 @@ Win32/
 *.out
 *.o
 *.obj
-*.a
-*.so
-*.dylib
 
 # IDE / generated metadata
 *.depend
@@ -36,12 +33,6 @@ desktop.ini
 # Python cache
 __pycache__/
 *.pyc
-
-# Big third-party source trees and extras
-common/freeglut/
-common/assimp/
-common/glew/bin/
-common/glew/doc/
 
 # Archives
 *.zip

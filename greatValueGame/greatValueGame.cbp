@@ -8,24 +8,22 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/greatValueGame" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/common/bin" />
+				<Option working_dir="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/CS291GameDev/common/bin" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/greatValueGame" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/common/bin" />
+				<Option working_dir="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/CS291GameDev/common/bin" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -34,68 +32,17 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="../common" />
+			<Add directory="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/CS291GameDev/common/include" />
 		</Compiler>
 		<Linker>
-			<Add library="../common/lib/libSOIL.a" />
 			<Add library="freeglut" />
 			<Add library="opengl32" />
 			<Add library="glu32" />
 			<Add library="winmm" />
 			<Add library="gdi32" />
-			<Add library="../common/lib/freeglut.lib" />
-			<Add library="../common/lib/glew32.lib" />
-			<Add library="../common/lib/libirrKlang.a" />
-			<Add directory="../common/lib" />
+			<Add directory="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/CS291GameDev/common/lib" />
 		</Linker>
-		<Unit filename="include/Anorms.h" />
-		<Unit filename="include/_ModelLoaderMD2.h" />
-		<Unit filename="include/_bullets.h" />
-		<Unit filename="include/_camera.h" />
-		<Unit filename="include/_collision.h" />
-		<Unit filename="include/_common.h" />
-		<Unit filename="include/_ground.h" />
-		<Unit filename="include/_hudicon.h" />
-		<Unit filename="include/_inputs.h" />
-		<Unit filename="include/_landingscene.h" />
-		<Unit filename="include/_lighting.h" />
-		<Unit filename="include/_menuscene.h" />
-		<Unit filename="include/_model.h" />
-		<Unit filename="include/_modelvbo.h" />
-		<Unit filename="include/_parallax.h" />
-		<Unit filename="include/_scene.h" />
-		<Unit filename="include/_scenejungle.h" />
-		<Unit filename="include/_scenevirtualworld.h" />
-		<Unit filename="include/_skybox.h" />
-		<Unit filename="include/_sounds.h" />
-		<Unit filename="include/_spritesheet.h" />
-		<Unit filename="include/_texloader.h" />
-		<Unit filename="include/_tutorialscene.h" />
-		<Unit filename="include/iscene.h" />
-		<Unit filename="include/scenemanager.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/_ModelLoaderMD2.cpp" />
-		<Unit filename="src/_bullets.cpp" />
-		<Unit filename="src/_camera.cpp" />
-		<Unit filename="src/_collision.cpp" />
-		<Unit filename="src/_ground.cpp" />
-		<Unit filename="src/_hudicon.cpp" />
-		<Unit filename="src/_inputs.cpp" />
-		<Unit filename="src/_landingscene.cpp" />
-		<Unit filename="src/_lighting.cpp" />
-		<Unit filename="src/_menuscene.cpp" />
-		<Unit filename="src/_model.cpp" />
-		<Unit filename="src/_modelvbo.cpp" />
-		<Unit filename="src/_parallax.cpp" />
-		<Unit filename="src/_scene.cpp" />
-		<Unit filename="src/_scenejungle.cpp" />
-		<Unit filename="src/_scenevirtualworld.cpp" />
-		<Unit filename="src/_skybox.cpp" />
-		<Unit filename="src/_sounds.cpp" />
-		<Unit filename="src/_spritesheet.cpp" />
-		<Unit filename="src/_texloader.cpp" />
-		<Unit filename="src/_tutorialscene.cpp" />
-		<Unit filename="src/scenemanager.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
