@@ -34,7 +34,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/common/include" />
+			<Add directory="../common" />
 		</Compiler>
 		<Linker>
 			<Add library="../common/lib/libSOIL.a" />
@@ -46,7 +46,7 @@
 			<Add library="../common/lib/freeglut.lib" />
 			<Add library="../common/lib/glew32.lib" />
 			<Add library="../common/lib/libirrKlang.a" />
-			<Add directory="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/common/lib" />
+			<Add directory="../common/lib" />
 		</Linker>
 		<Unit filename="include/Anorms.h" />
 		<Unit filename="include/_ModelLoaderMD2.h" />
