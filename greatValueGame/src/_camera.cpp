@@ -119,3 +119,16 @@ void _camera::setUpCamera()
               up.x,up.y,up.z
               );
 }
+
+void _camera::followTarget(vec3 targetPos, float targetYaw, float followDistance, float followHeight, float lookHeight)
+{
+    float yawRad = targetYaw * (float)PI / 180.0f;
+
+    eye.x = targetPos.x - sinf(yawRad) * followDistance;
+    eye.y = targetPos.y + followHeight;
+    eye.z = targetPos.z + cosf(yawRad) * followDistance;
+
+    dest.x = targetPos.x;
+    dest.y = targetPos.y + lookHeight;
+    dest.z = targetPos.z;
+}

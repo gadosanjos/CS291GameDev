@@ -23,6 +23,7 @@ class _camera
 
         void camMoveFB(int);// Move Camera front and back
         void camMoveLR(int);// Move camera to sides
+        void followTarget(vec3 targetPos, float targetYaw, float followDistance, float followHeight, float lookHeight); // Move camera with object
 
         void setUpCamera(); // call setting in the display
 

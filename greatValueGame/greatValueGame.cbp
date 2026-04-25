@@ -63,6 +63,7 @@
 		<Unit filename="include/_model.h" />
 		<Unit filename="include/_modelvbo.h" />
 		<Unit filename="include/_parallax.h" />
+		<Unit filename="include/_player.h" />
 		<Unit filename="include/_scene.h" />
 		<Unit filename="include/_scenejungle.h" />
 		<Unit filename="include/_scenevirtualworld.h" />
@@ -87,6 +88,7 @@
 		<Unit filename="src/_model.cpp" />
 		<Unit filename="src/_modelvbo.cpp" />
 		<Unit filename="src/_parallax.cpp" />
+		<Unit filename="src/_player.cpp" />
 		<Unit filename="src/_scene.cpp" />
 		<Unit filename="src/_scenejungle.cpp" />
 		<Unit filename="src/_scenevirtualworld.cpp" />
