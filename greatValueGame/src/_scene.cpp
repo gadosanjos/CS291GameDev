@@ -202,7 +202,7 @@ void _Scene::drawScene()
     }
 
     // Move and draw road first
-    roadChunk(_Scene::deltaT);
+    //roadChunk(_Scene::deltaT);
 
     // --------------------------------------
     // 5. draw gameplay entities
@@ -219,12 +219,12 @@ void _Scene::drawScene()
     }
 
     glPushMatrix();
-        //testCube->drawModel();
-        testCube->pos.x = laneX[currentPlayerLane];
+        testCube->drawModel();
+        testCube->pos = cam->dest;
     glPopMatrix();
 
     glPushMatrix();
-        glTranslatef(laneX[currentPlayerLane], 0, 0);
+        glTranslatef(cam->dest.x, cam->dest.y, cam->dest.z);
         glRotatef(-90,1,0,0);
         glRotatef(90,0,0,1);
         glScalef(0.03,0.03,0.03);
@@ -281,16 +281,17 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         keyMS->keyPressed(testCube);
         keyMS->keyPressed(box);
         //keyMS->keyPressed(skyBox);
-        //keyMS->keyPressed(cam); // camera should be fixed
+        keyMS->keyPressed(cam); // camera should be fixed
         //keyMS->keyPressed(mySprite);
         keyMS->keyPressed(mdl,mdlW);
         break;
 
     case WM_KEYUP:
-         //mySprite->actionTrigger = mySprite->STAND;
-         break;
-
+        mdlW->actionTrigger= mdl->actionTrigger=mdl->STAND;
+        break;
     case WM_LBUTTONDOWN:
+
+             mdlW->actionTrigger= mdl->actionTrigger=mdl->ATTACK;
         // after game over
             if(gameOver){
                 float mouseX = (float)LOWORD(lParam);
@@ -500,62 +501,6 @@ void _Scene::clearChunkObstacles(int chunkIndex)
 // ======================================================
 // Debug helpers
 // ======================================================
-
-void _Scene::drawTestObstacles(int chunkIndex)
-{
-    // Height where the obstacle boxes will sit.
-    float obstacleY = -0.4f;
-
-    // These are the z positions of each logical obstacle row
-    // INSIDE one single road chunk.
-    // these are NOT world positions by themselves.
-    // They are local offsets relative to the center of the road chunk.
-    // Since one road chunk is length 30, its center covers:
-    // center - 15  to  center + 15
-    // So these rows are being placed inside that chunk at:
-    // -12, -4, +4, +12 from the chunk center.
-    // Then the actual obstacle z positions become:
-    //    row 0  -30 + (-12) = -42
-    //    row 1  -30 + (-4) = -34
-    //    row 2  -30 + 4 = -26
-    //    row 3  -30 + 12 = -18
-    float localRowZ[4] = { -12.0f, -4.0f, 4.0f, 12.0f };
-    // Loop through obstacle rows.
-    // In this test: 4 rows total.
-    for (int row = 0; row < 4; row++) {
-        // Loop through the 3 lanes:
-        // lane 0 = left x = -2.5
-        // lane 1 = middle x = 0
-        // lane 2 = right x = 2.5
-        for (int lane = 0; lane < 3; lane++) {
-            // testGrid[row][lane] tells us whether this cell should contain an obstacle box or not.
-            // 1 = place a box here
-            // 0 = leave this spot empty
-            // Example:
-            // if testGrid[0][1] == 1,
-            // then row 0, middle lane gets a box.
-            if (testGrid[row][lane] == 1) {
-                // Set the box x position based on which lane it belongs to.
-                // laneX[0] might be left lane x
-                // laneX[1] might be middle lane x
-                // laneX[2] might be right lane x
-                box->pos.x = laneX[lane];
-                box->pos.y = obstacleY;
-                // road[chunkIndex]->pos.z = the CENTER z position of the current road chunk
-                // localRowZ[row] = where inside that chunk this obstacle row should sit
-                // final obstacle z = chunk center z + local row offset
-                box->pos.z = road[chunkIndex]->pos.z + localRowZ[row];
-                box->drawModel();
-                if (chunkIndex == 0 && row == 0 && lane == 1) {
-                    std::cout << "road z: " << road[chunkIndex]->pos.z
-                              << " obstacle z: " << box->pos.z
-                              << " local offset: " << localRowZ[row]
-                              << std::endl;
-                }
-            }
-        }
-    }
-}
 
 void _Scene::mouseMapping(int x, int y)
 {

@@ -251,7 +251,7 @@ void _inputs::mouseWheel(_camera* camera, double delta)
     // can zoom in between values of [2, 10]
     float newZ = camera->eye.z - delta / 100.0f;
 
-    if (newZ >= 2.0f && newZ <= 10.0f) {
+    if (newZ >= (camera->dest.z + 2.0f) && newZ <= (camera->dest.z + 10.0f)) {
         camera->eye.z = newZ;
     }
 }

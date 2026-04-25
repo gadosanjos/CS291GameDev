@@ -6,7 +6,7 @@ _ground::_ground()
     rot.x=rot.y=rot.z =0;
 
     // basically flattening the cube into a road
-    scale.x = 8.0f;   // road width
+    scale.x = 30.0f;   // road width
     scale.y = 0.2f;   // road thickness
     scale.z = 30.0f;  // road length
 

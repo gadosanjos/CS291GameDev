@@ -36,7 +36,7 @@ GLint _LandingScene::initGL()
     myMusic->iniSounds();
     myMusic->playMusic("sounds/Horizons.mp3");
 
-    parallax->parallaxInit("images/parallax.jpg", wWidth, wHeight);
+    parallax->parallaxInit("images/menu/landing.png", wWidth, wHeight);
 
     return true;
 }
@@ -69,8 +69,6 @@ void _LandingScene::drawScene()
     glPushMatrix();
         glTranslatef(0,0,-1.75);
         parallax->drawParallax();
-        parallax->scroll(true, parallax->LEFT, 0.05*deltaT);
-        parallax->updateParallax();
     glPopMatrix();
 }
 

@@ -3,8 +3,8 @@
 SceneManager::SceneManager()
 {
     //ctor
-    currentScene = new _LandingScene();
-    //currentScene = new _Scene();
+    //currentScene = new _LandingScene();
+    currentScene = new _Scene();
     //currentScene = new _SceneVirtualWorld();
     //currentScene = new _SceneJungle();
 

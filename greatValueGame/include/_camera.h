@@ -10,7 +10,7 @@ class _camera
         virtual ~_camera();
 
         vec3 eye; // camera position
-        vec3 des; // Where you r looking at
+        vec3 dest; // Where you r looking at
         vec3 up;  // Camera head orientation
 
         float step; //camera speed

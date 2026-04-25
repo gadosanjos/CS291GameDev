@@ -34,11 +34,11 @@ GLint _MenuScene::initGL()
     myMusic->iniSounds();
     myMusic->playMusic("sounds/Duty Calls.mp3");
 
-    parallax->parallaxInit("images/parallax.jpg", wWidth, wHeight);
+    parallax->parallaxInit("images/menu/bkg.png", wWidth, wHeight);
 
-    titleIcon->initIcon("images/menu_title.png");
-    newGameIcon->initIcon("images/newgame.png");
-    tutorialIcon->initIcon("images/tutorial.png");
+    titleIcon->initIcon("images/menu/menu_title.png");
+    newGameIcon->initIcon("images/menu/newgame.png");
+    tutorialIcon->initIcon("images/menu/tutorial.png");
     exitIcon->initIcon("images/exit.png");
 
     // Title

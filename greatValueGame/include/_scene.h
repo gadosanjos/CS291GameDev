@@ -114,16 +114,6 @@ class _Scene : public IScene
         bool coinCollected[NUM_ROAD_CHUNKS][ROWS_PER_CHUNK][LANES] = {};
 
         // debug / Temp
-        // 0 empty
-        // 1 obstacle
-        // 2 coin
-        void drawTestObstacles(int chunkIndex);
-        int testGrid[ROWS_PER_CHUNK][LANES] = {
-            {0, 1, 0},
-            {0, 0, 0},
-            {1, 0, 0},
-            {0, 0, 1}
-        };
 
         // misc scene state
         static float deltaT;
