@@ -54,6 +54,7 @@
 		<Unit filename="include/_camera.h" />
 		<Unit filename="include/_collision.h" />
 		<Unit filename="include/_common.h" />
+		<Unit filename="include/_enemy.h" />
 		<Unit filename="include/_ground.h" />
 		<Unit filename="include/_hudicon.h" />
 		<Unit filename="include/_inputs.h" />
@@ -79,6 +80,7 @@
 		<Unit filename="src/_bullets.cpp" />
 		<Unit filename="src/_camera.cpp" />
 		<Unit filename="src/_collision.cpp" />
+		<Unit filename="src/_enemy.cpp" />
 		<Unit filename="src/_ground.cpp" />
 		<Unit filename="src/_hudicon.cpp" />
 		<Unit filename="src/_inputs.cpp" />

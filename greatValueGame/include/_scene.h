@@ -10,6 +10,8 @@
 #include "_hudicon.h"
 #include "_ground.h"
 #include "_player.h"
+#include "_enemy.h"
+#include <vector>
 
 class _Scene : public IScene
 {
@@ -29,6 +31,11 @@ public:
     void drawGameOverHUD();
     void resetGame();
 
+    // mob helpers
+    void updateEnemies(float deltaT);
+    void drawEnemies();
+    void spawnEnemy(float x, float y, float z);
+
     // scene systems
     _lighting* myLight = new _lighting();
     _skyBox* skyBox = new _skyBox();
@@ -38,6 +45,7 @@ public:
     // world objects
     _ground* worldGround = new _ground();
     _Player* player = new _Player();
+    std::vector<_Enemy*> enemies;
 
     // HUD
     _hudIcon* heartIcon = new _hudIcon();

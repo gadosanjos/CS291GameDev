@@ -20,6 +20,11 @@ _Scene::~_Scene()
     delete myMusic;
     delete worldGround;
     delete player;
+
+    for (size_t i = 0; i < enemies.size(); i++) {
+        delete enemies[i];
+    }
+    enemies.clear();
 }
 
 // ======================================================
@@ -78,6 +83,9 @@ GLint _Scene::initGL()
     player->pos.z = 0.0f;
     player->yaw = 0.0f;
 
+    spawnEnemy(8.0f, 0.0f, -8.0f);
+    spawnEnemy(-10.0f, 0.0f, -15.0f);
+
     // world ground
     worldGround->modelInit("images/jungleScene/jungle_road.png");
     worldGround->scale.x = 100.0f;
@@ -87,7 +95,7 @@ GLint _Scene::initGL()
     worldGround->pos.z = 0.0f;
 
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
-    player->playerLives = 0;
+    //player->playerLives = 0; // game over debug
     return true;
 }
 
@@ -153,6 +161,7 @@ void _Scene::drawScene()
     }
 
     player->update(deltaT);
+    updateEnemies(deltaT);
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
 
     // --------------------------------------
@@ -160,6 +169,7 @@ void _Scene::drawScene()
     // --------------------------------------
 
     player->draw();
+    drawEnemies();
 }
 
 // ======================================================
@@ -172,6 +182,34 @@ void _Scene::drawWorld()
         worldGround->drawModel();
         drawLivesHUD();
     glPopMatrix();
+}
+
+// ======================================================
+// Mob helpers
+// ======================================================
+
+void _Scene::spawnEnemy(float x, float y, float z)
+{
+    _Enemy* e = new _Enemy();
+    e->init("models/Tekk/tris.md2", "models/Tekk/blade.jpg");
+    e->pos.x = x;
+    e->pos.y = y;
+    e->pos.z = z;
+    enemies.push_back(e);
+}
+
+void _Scene::updateEnemies(float deltaT)
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        enemies[i]->update(deltaT, player->pos);
+    }
+}
+
+void _Scene::drawEnemies()
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        enemies[i]->draw();
+    }
 }
 
 // ======================================================
@@ -284,6 +322,10 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
     }
 }
+
+// ======================================================
+// HUD
+// ======================================================
 
 void _Scene::drawLivesHUD()
 {
