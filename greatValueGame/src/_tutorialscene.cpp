@@ -36,12 +36,12 @@ GLint _TutorialScene::initGL()
     myMusic->iniSounds();
     myMusic->playMusic("sounds/Ancient Civilisations.mp3");
 
-    parallax->parallaxInit("images/tutorialbkg.png", wWidth, wHeight);
+    parallax->parallaxInit("images/menu/instructions.png", wWidth, wHeight);
 
-    //titleIcon->initIcon("images/menu_title.png");
-    newGameIcon->initIcon("images/menu.png");
-    tutorialIcon->initIcon("images/tutorial.png");
-    exitIcon->initIcon("images/exit.png");
+    //titleIcon->initIcon("images/menu/menu_title.png");
+    newGameIcon->initIcon("images/menu/menu.png");
+    tutorialIcon->initIcon("images/menu/tutorial.png");
+    exitIcon->initIcon("images/menu/exit.png");
 
     // Title
     //titleIcon->width = 420.0f;
@@ -50,26 +50,26 @@ GLint _TutorialScene::initGL()
     // Buttons
     buttons[0].icon = newGameIcon;
     buttons[0].anchor = TOP_RIGHT;
-    buttons[0].offsetY = -80.0f;
+    buttons[0].offsetY = -30.0f;
     buttons[0].offsetX = 180.0f;
-    buttons[0].width = 260.0f;
-    buttons[0].height = 70.0f;
+    buttons[0].width = 520.0f;
+    buttons[0].height = 320.0f;
     buttons[0].action = ACTION_NEW_GAME;
 
     buttons[1].icon = tutorialIcon;
     buttons[1].anchor = TOP_RIGHT;
-    buttons[1].offsetY = 10.0f;
+    buttons[1].offsetY = 170.0f;
     buttons[1].offsetX = 180.0f;
-    buttons[1].width = 260.0f;
-    buttons[1].height = 70.0f;
+    buttons[1].width = 520.0f;
+    buttons[1].height = 320.0f;
     buttons[1].action = ACTION_TUTORIAL;
 
     buttons[2].icon = exitIcon;
     buttons[2].anchor = TOP_RIGHT;
-    buttons[2].offsetY = 100.0f;
+    buttons[2].offsetY = 370.0f;
     buttons[2].offsetX = 180.0f;
-    buttons[2].width = 260.0f;
-    buttons[2].height = 70.0f;
+    buttons[2].width = 520.0f;
+    buttons[2].height = 320.0f;
     buttons[2].action = ACTION_EXIT;
 
     return true;

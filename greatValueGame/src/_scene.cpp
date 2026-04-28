@@ -55,26 +55,25 @@ GLint _Scene::initGL()
 
     // skybox
     skyBox->boxInit();
-    skyBox->myTex[0].loadTexture("images/front.png");
-    skyBox->myTex[1].loadTexture("images/back.png");
-    skyBox->myTex[2].loadTexture("images/top.png");
-    skyBox->myTex[3].loadTexture("images/bottom.png");
-    skyBox->myTex[4].loadTexture("images/left.png");
-    skyBox->myTex[5].loadTexture("images/right.png");
-
+    skyBox->myTex[0].loadTexture("images/back.bmp");
+    skyBox->myTex[1].loadTexture("images/front.bmp");
+    skyBox->myTex[2].loadTexture("images/top.bmp");
+    skyBox->myTex[3].loadTexture("images/bottom.bmp");
+    skyBox->myTex[4].loadTexture("images/left.bmp");
+    skyBox->myTex[5].loadTexture("images/right.bmp");
     // HUD
     heartIcon->initIcon("images/heart.png");
     heartIcon->width = 60.0f;
     heartIcon->height = 60.0f;
     gameOverPanel->initIcon("images/menu/gameover.png");
-    gameOverPanel->width = 300.0f;
-    gameOverPanel->height = 120.0f;
-    playAgainPanel->initIcon("images/menu/newgame.png");
-    playAgainPanel->width = 150.0f;
-    playAgainPanel->height = 60.0f;
+    gameOverPanel->width = 1000.0f;
+    gameOverPanel->height = 520.0f;
+    playAgainPanel->initIcon("images/menu/playagain.png");
+    playAgainPanel->width = 500.0f;
+    playAgainPanel->height = 300.0f;
     exitPanel->initIcon("images/menu/exit.png");
-    exitPanel->width = 150.0f;
-    exitPanel->height = 60.0f;
+    exitPanel->width = 500.0f;
+    exitPanel->height = 300.0f;
 
     // player model
     player->init("models/Tekk/tris.md2", "models/Tekk/blade.jpg");
@@ -342,11 +341,11 @@ void _Scene::drawGameOverHUD()
     gameOverPanel->pos.y = (wHeight / 2.0f) - (gameOverPanel->height / 2.0f);
     gameOverPanel->draw(wWidth, wHeight);
 
-    exitPanel->pos.x = (wWidth / 2.0f) +150.0f;
-    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) +300.0f;
+    exitPanel->pos.x = (wWidth / 2.0f) + 400.0f;
+    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) + 300.0f;
     exitPanel->draw(wWidth, wHeight);
 
-    playAgainPanel->pos.x = (wWidth / 2.0f) - 150.0f;
+    playAgainPanel->pos.x = (wWidth / 2.0f) - 400.0f;
     playAgainPanel->pos.y = ((wHeight / 2.0f) - (playAgainPanel->height / 2.0f)) +300.0f;
     playAgainPanel->draw(wWidth, wHeight);
 }

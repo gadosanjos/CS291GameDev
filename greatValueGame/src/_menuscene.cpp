@@ -39,32 +39,32 @@ GLint _MenuScene::initGL()
     titleIcon->initIcon("images/menu/menu_title.png");
     newGameIcon->initIcon("images/menu/newgame.png");
     tutorialIcon->initIcon("images/menu/tutorial.png");
-    exitIcon->initIcon("images/exit.png");
+    exitIcon->initIcon("images/menu/exit.png");
 
     // Title
-    titleIcon->width = 420.0f;
-    titleIcon->height = 140.0f;
+    titleIcon->width = 1240.0f;
+    titleIcon->height = 600.0f;
 
     // Buttons
     buttons[0].icon = newGameIcon;
     buttons[0].anchor = MID_CENTER;
-    buttons[0].offsetY = -80.0f;
-    buttons[0].width = 260.0f;
-    buttons[0].height = 70.0f;
+    buttons[0].offsetY = 50.0f;
+    buttons[0].width = 520.0f;
+    buttons[0].height = 320.0f;
     buttons[0].action = ACTION_NEW_GAME;
 
     buttons[1].icon = tutorialIcon;
     buttons[1].anchor = MID_CENTER;
-    buttons[1].offsetY = 10.0f;
-    buttons[1].width = 260.0f;
-    buttons[1].height = 70.0f;
+    buttons[1].offsetY = 250.0f;
+    buttons[1].width = 520.0f;
+    buttons[1].height = 320.0f;
     buttons[1].action = ACTION_TUTORIAL;
 
     buttons[2].icon = exitIcon;
     buttons[2].anchor = MID_CENTER;
-    buttons[2].offsetY = 100.0f;
-    buttons[2].width = 260.0f;
-    buttons[2].height = 70.0f;
+    buttons[2].offsetY = 450.0f;
+    buttons[2].width = 520.0f;
+    buttons[2].height = 320.0f;
     buttons[2].action = ACTION_EXIT;
 
     return true;
@@ -183,7 +183,7 @@ void _MenuScene::drawScene()
     glPopMatrix();
 
     titleIcon->pos.x = wWidth * 0.5f;
-    titleIcon->pos.y = 140.0f;
+    titleIcon->pos.y = 300.0f;
     titleIcon->draw(wWidth, wHeight);
 
     for (int i = 0; i < BUTTON_COUNT; i++) {
