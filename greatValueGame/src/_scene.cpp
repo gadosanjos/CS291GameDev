@@ -1,6 +1,8 @@
 #include "_scene.h"
 #include "scenemanager.h"
 #include "_menuscene.h"
+#include "_tutorialscene.h"
+#include "_pausedscene.h"
 #include <cmath>
 
 // ======================================================
@@ -68,9 +70,18 @@ GLint _Scene::initGL()
     gameOverPanel->initIcon("images/menu/gameover.png");
     gameOverPanel->width = 1000.0f;
     gameOverPanel->height = 520.0f;
-    playAgainPanel->initIcon("images/menu/playagain.png");
+    pausedPanel->initIcon("images/menu/gameover.png");
+    pausedPanel->width = 1000.0f;
+    pausedPanel->height = 520.0f;
+    playAgainPanel->initIcon("images/menu/newgame.png");
     playAgainPanel->width = 500.0f;
     playAgainPanel->height = 300.0f;
+    helpPanel->initIcon("images/menu/tutorial.png");
+    helpPanel->width = 500.0f;
+    helpPanel->height = 300.0f;
+    menuPanel->initIcon("images/menu/menu.png");
+    menuPanel->width = 500.0f;
+    menuPanel->height = 300.0f;
     exitPanel->initIcon("images/menu/exit.png");
     exitPanel->width = 500.0f;
     exitPanel->height = 300.0f;
@@ -126,6 +137,20 @@ void _Scene::drawScene()
     _Scene::deltaT = elapsed.count();
     lastTime = currentTime;
 
+    // update game timer
+    if (!gameOver) {
+        if(paused){
+            //
+        } else {
+            gameTimeRemaining -= deltaT;
+        }
+
+        if (gameTimeRemaining <= 0.0f) {
+            gameTimeRemaining = 0.0f;
+            gameOver = true;
+        }
+    }
+
     // --------------------------------------
     // 2. clear frame and set camera
     // --------------------------------------
@@ -158,6 +183,10 @@ void _Scene::drawScene()
     } else if(player->playerLives >= 10){
         manager->requestSceneChange(new _SceneVirtualWorld());
     }
+    if(paused){
+        pausedHUD();
+        return;
+    }
 
     player->update(deltaT);
     updateEnemies(deltaT);
@@ -180,6 +209,7 @@ void _Scene::drawWorld()
     glPushMatrix();
         worldGround->drawModel();
         drawLivesHUD();
+        drawTimerHUD();
     glPopMatrix();
 }
 
@@ -247,7 +277,8 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         manager->requestSceneChange(new _MenuScene());
                     }
                     break;
-
+                case 'P':
+                    paused = true;
                 default:
                     break;
             }
@@ -286,23 +317,84 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 float mouseY = (float)HIWORD(lParam);
 
                 vec3 posExitPanel = exitPanel->pos;
-                vec3 posPlayPanel = playAgainPanel->pos;
+                vec3 posPlayAgainPanel = playAgainPanel->pos;
+                vec3 posMenuPanel = menuPanel->pos;
+                vec3 posHelpPanel = helpPanel->pos;
 
-                float left   = posExitPanel.x - exitPanel->width * 0.5f;
-                float right  = posExitPanel.x + exitPanel->width * 0.5f;
-                float top    = posExitPanel.y - exitPanel->height * 0.5f;
-                float bottom = posExitPanel.y + exitPanel->height * 0.5f;
+                float leftExit   = posExitPanel.x - exitPanel->width * 0.5f;
+                float rightExit  = posExitPanel.x + exitPanel->width * 0.5f;
+                float topExit    = posExitPanel.y - exitPanel->height * 0.5f;
+                float bottomExit = posExitPanel.y + exitPanel->height * 0.5f;
 
-                float left2   = posPlayPanel.x - playAgainPanel->width * 0.5f;
-                float right2  = posPlayPanel.x + playAgainPanel->width * 0.5f;
-                float top2    = posPlayPanel.y - playAgainPanel->height * 0.5f;
-                float bottom2 = posPlayPanel.y + playAgainPanel->height * 0.5f;
+                float leftPlay   = posPlayAgainPanel.x - playAgainPanel->width * 0.5f;
+                float rightPlay  = posPlayAgainPanel.x + playAgainPanel->width * 0.5f;
+                float topPlay    = posPlayAgainPanel.y - playAgainPanel->height * 0.5f;
+                float bottomPlay = posPlayAgainPanel.y + playAgainPanel->height * 0.5f;
 
-                if(mouseX >= left2 && mouseX <= right2 && mouseY >= top2  && mouseY <= bottom2){
+                if (mouseX >= leftPlay && mouseX <= rightPlay &&
+                    mouseY >= topPlay && mouseY <= bottomPlay)
+                {
                     resetGame();
                 }
-                if(mouseX >= left && mouseX <= right && mouseY >= top  && mouseY <= bottom){
+                else if (mouseX >= leftExit && mouseX <= rightExit &&
+                         mouseY >= topExit && mouseY <= bottomExit)
+                {
                     manager->requestSceneChange(new _MenuScene());
+                }
+            }
+            // Copy this entire if statement.
+            if (paused){
+                float mouseX = (float)LOWORD(lParam);
+                float mouseY = (float)HIWORD(lParam);
+
+                vec3 posExitPanel = exitPanel->pos;
+                vec3 posPlayAgainPanel = playAgainPanel->pos;
+                vec3 posMenuPanel = menuPanel->pos;
+                vec3 posHelpPanel = helpPanel->pos;
+
+                float leftExit   = posExitPanel.x - exitPanel->width * 0.5f;
+                float rightExit  = posExitPanel.x + exitPanel->width * 0.5f;
+                float topExit    = posExitPanel.y - exitPanel->height * 0.5f;
+                float bottomExit = posExitPanel.y + exitPanel->height * 0.5f;
+
+                float leftPlay   = posPlayAgainPanel.x - playAgainPanel->width * 0.5f;
+                float rightPlay  = posPlayAgainPanel.x + playAgainPanel->width * 0.5f;
+                float topPlay    = posPlayAgainPanel.y - playAgainPanel->height * 0.5f;
+                float bottomPlay = posPlayAgainPanel.y + playAgainPanel->height * 0.5f;
+
+                float leftMenu   = posMenuPanel.x - menuPanel->width * 0.5f;
+                float rightMenu  = posMenuPanel.x + menuPanel->width * 0.5f;
+                float topMenu    = posMenuPanel.y - menuPanel->height * 0.5f;
+                float bottomMenu  = posMenuPanel.y + menuPanel->height * 0.5f;
+
+                float leftHelp   = posHelpPanel.x - helpPanel->width * 0.5f;
+                float rightHelp  = posHelpPanel.x + helpPanel->width * 0.5f;
+                float topHelp    = posHelpPanel.y - helpPanel->height * 0.5f;
+                float bottomHelp  = posHelpPanel.y + helpPanel->height * 0.5f;
+
+                if (mouseX >= leftPlay && mouseX <= rightPlay &&
+                    mouseY >= topPlay && mouseY <= bottomPlay)
+                {
+                    //resetGame();
+                    paused = false;
+                }
+                else if (mouseX >= leftExit && mouseX <= rightExit &&
+                         mouseY >= topExit && mouseY <= bottomExit)
+                {
+                    PostQuitMessage(0);
+                    paused = false;
+                }
+                else if (mouseX >= leftMenu && mouseX <= rightMenu &&
+                         mouseY >= topMenu && mouseY <= bottomMenu)
+                {
+                    manager->requestSceneChange(new _MenuScene());
+                    paused = false;
+                }
+                else if (mouseX >= leftHelp && mouseX <= rightHelp &&
+                         mouseY >= topHelp && mouseY <= bottomHelp)
+                {
+                    manager->requestSceneChange(new _TutorialScene());
+                    paused = false;
                 }
             }
             break;
@@ -350,10 +442,92 @@ void _Scene::drawGameOverHUD()
     playAgainPanel->draw(wWidth, wHeight);
 }
 
+void _Scene::drawTimerHUD()
+{
+    int totalSeconds = (int)gameTimeRemaining;
+
+    int minutes = totalSeconds / 60;
+    int seconds = totalSeconds % 60;
+
+    char timerText[32];
+
+    sprintf(timerText, "SURVIVE: %d:%02d", minutes, seconds);
+
+    //many draws to make it look bold
+    drawText(wWidth/2, wHeight - 90.0f, timerText, 0.25f);
+    drawText(wWidth/2, wHeight - 80.0f, timerText, 0.25f);
+    drawText((wWidth/2)+1.0, wHeight - 80.0f, timerText, 0.25f);
+    drawText((wWidth/2)-1.0, wHeight - 80.0f, timerText, 0.25f);
+    drawText((wWidth/2)+1.0, wHeight - 79.0f, timerText, 0.25f);
+}
+
+void _Scene::pausedHUD()
+{
+    pausedPanel->pos.x = wWidth / 2.0f;
+    pausedPanel->pos.y = (wHeight / 2.0f) - (pausedPanel->height / 2.0f);
+    pausedPanel->draw(wWidth, wHeight);
+
+    exitPanel->pos.x = (wWidth / 2.0f) + 600.0f;
+    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) + 300.0f;
+    exitPanel->draw(wWidth, wHeight);
+
+    playAgainPanel->pos.x = (wWidth / 2.0f) - 600.0f;
+    playAgainPanel->pos.y = ((wHeight / 2.0f) - (playAgainPanel->height / 2.0f)) +300.0f;
+    playAgainPanel->draw(wWidth, wHeight);
+
+    menuPanel->pos.x = (wWidth / 2.0f) + 200.0f;
+    menuPanel->pos.y = ((wHeight / 2.0f) - (menuPanel->height / 2.0f)) +300.0f;
+    menuPanel->draw(wWidth, wHeight);
+
+    helpPanel->pos.x = (wWidth / 2.0f) - 200.0f;
+    helpPanel->pos.y = ((wHeight / 2.0f) - (helpPanel->height / 2.0f)) +300.0f;
+    helpPanel->draw(wWidth, wHeight);
+}
+
 void _Scene::resetGame()
 {
     player->playerLives = 5;
     gameOver = false;
+    gameTimeRemaining = 300.0f;
+
     player->pos.x = 100;
 
+    cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
+}
+
+void _Scene::drawText(float x, float y, const char* text, float scale)
+{
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    gluOrtho2D(0, wWidth, 0, wHeight);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glTranslatef(x, y, 0.0f);
+    glScalef(scale, scale, 1.0f);
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, text[i]);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
 }

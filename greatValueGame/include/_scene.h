@@ -29,7 +29,10 @@ public:
     void drawWorld();
     void drawLivesHUD();
     void drawGameOverHUD();
+    void pausedHUD();
+    void drawTimerHUD();
     void resetGame();
+    void drawText(float x, float y, const char* text, float scale);
 
     // mob helpers
     void updateEnemies(float deltaT);
@@ -52,6 +55,9 @@ public:
     _hudIcon* gameOverPanel = new _hudIcon();
     _hudIcon* playAgainPanel = new _hudIcon();
     _hudIcon* exitPanel = new _hudIcon();
+    _hudIcon* menuPanel = new _hudIcon();
+    _hudIcon* helpPanel = new _hudIcon();
+    _hudIcon* pausedPanel = new _hudIcon();
 
     // camera follow settings
     float camFollowDistance = 8.0f;
@@ -59,7 +65,9 @@ public:
     float camLookHeight = 1.5f;
 
     // misc scene state
+    float gameTimeRemaining = 300.0f; // 5 minutes in seconds
     bool gameOver = false;
+    bool paused = false;
     static float deltaT;
     float wWidth, wHeight;
     char* song = "sounds/Conspiracy Theory.mp3";
