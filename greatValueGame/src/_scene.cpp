@@ -27,6 +27,10 @@ _Scene::~_Scene()
         delete enemies[i];
     }
     enemies.clear();
+    for (size_t i = 0; i < portals.size(); i++) {
+        delete portals[i].sprite;
+    }
+    portals.clear();
 }
 
 // ======================================================
@@ -93,8 +97,9 @@ GLint _Scene::initGL()
     player->pos.z = 0.0f;
     player->yaw = 0.0f;
 
-    spawnEnemy(8.0f, 0.0f, -8.0f);
-    spawnEnemy(-10.0f, 0.0f, -15.0f);
+    // One enemy initialization so i dont forget
+    spawnPortals(0.0f, 0.0f, -20.0f);
+    spawnEnemy(0.0f, 0.0f, -20.0f);
 
     // world ground
     worldGround->modelInit("images/jungleScene/jungle_road.png");
@@ -187,8 +192,12 @@ void _Scene::drawScene()
         pausedHUD();
         return;
     }
+    if(enemies.size() < 25){
+        randomizeEnemySpawnPositions(player->pos, 10, 25);
+    }
 
     player->update(deltaT);
+    updatePortals(deltaT);
     updateEnemies(deltaT);
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
 
@@ -197,6 +206,7 @@ void _Scene::drawScene()
     // --------------------------------------
 
     player->draw();
+    drawPortals();
     drawEnemies();
 }
 
@@ -216,6 +226,37 @@ void _Scene::drawWorld()
 // ======================================================
 // Mob helpers
 // ======================================================
+void _Scene::randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance)
+{
+    float angle = ((float)rand() / RAND_MAX) * 2.0f * (float)PI;
+    float radius = minDistance + ((float)rand() / RAND_MAX) * distanceRange;
+
+    float spawnX = playerPos.x + cosf(angle) * radius;
+    float spawnZ = playerPos.z + sinf(angle) * radius;
+
+    spawnPortals(spawnX, 0.0f, spawnZ-1);
+    spawnEnemy(spawnX, 0.0f, spawnZ);
+}
+
+void _Scene::spawnPortals(float x, float y, float z)
+{
+    PortalEffect p;
+
+    p.sprite = new _spritesheet();
+    p.sprite->spriteInit("images/blueportal.png", 1, 1);
+    p.sprite->pos.x = x;
+    p.sprite->pos.y = y;
+    p.sprite->pos.z = z;
+
+    p.sprite->scale.x = 2.0f;
+    p.sprite->scale.y = 2.0f;
+    p.sprite->scale.z = 1.0f;
+
+    p.lifetime = 3.0f; // portal stays for 3 seconds
+    p.age = 0.0f;
+
+    portals.push_back(p);
+}
 
 void _Scene::spawnEnemy(float x, float y, float z)
 {
@@ -227,10 +268,31 @@ void _Scene::spawnEnemy(float x, float y, float z)
     enemies.push_back(e);
 }
 
+void _Scene::updatePortals(float deltaT)
+{
+    for (int i = (int)portals.size() - 1; i >= 0; i--) {
+        portals[i].age += deltaT;
+
+        if (portals[i].age >= portals[i].lifetime) {
+            delete portals[i].sprite;
+            portals.erase(portals.begin() + i);
+        }
+    }
+}
+
 void _Scene::updateEnemies(float deltaT)
 {
     for (size_t i = 0; i < enemies.size(); i++) {
         enemies[i]->update(deltaT, player->pos);
+    }
+}
+
+void _Scene::drawPortals()
+{
+    for (size_t i = 0; i < portals.size(); i++) {
+        if (portals[i].sprite) {
+            portals[i].sprite->drawSprite();
+        }
     }
 }
 
@@ -421,7 +483,7 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void _Scene::drawLivesHUD()
 {
     for (int i = 0; i < player->playerLives; i++) {
-        heartIcon->pos.x = 30.0f + i * 45.0f;
+        heartIcon->pos.x = 30.0f + i * 60.0f;
         heartIcon->pos.y = 30.0f;
         heartIcon->draw(wWidth, wHeight);
     }
@@ -454,7 +516,7 @@ void _Scene::drawTimerHUD()
     sprintf(timerText, "SURVIVE: %d:%02d", minutes, seconds);
 
     //many draws to make it look bold
-    drawText(wWidth/2, wHeight - 90.0f, timerText, 0.25f);
+    drawText(wWidth/2, wHeight - 79.0f, timerText, 0.25f);
     drawText(wWidth/2, wHeight - 80.0f, timerText, 0.25f);
     drawText((wWidth/2)+1.0, wHeight - 80.0f, timerText, 0.25f);
     drawText((wWidth/2)-1.0, wHeight - 80.0f, timerText, 0.25f);

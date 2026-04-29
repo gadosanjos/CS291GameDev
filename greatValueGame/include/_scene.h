@@ -11,6 +11,7 @@
 #include "_ground.h"
 #include "_player.h"
 #include "_enemy.h"
+#include "_spritesheet.h"
 #include <vector>
 
 class _Scene : public IScene
@@ -38,6 +39,10 @@ public:
     void updateEnemies(float deltaT);
     void drawEnemies();
     void spawnEnemy(float x, float y, float z);
+    void spawnPortals(float x, float y, float z);
+    void updatePortals(float deltaT);
+    void drawPortals();
+    void randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance);
 
     // scene systems
     _lighting* myLight = new _lighting();
@@ -49,6 +54,14 @@ public:
     _ground* worldGround = new _ground();
     _Player* player = new _Player();
     std::vector<_Enemy*> enemies;
+    struct PortalEffect
+    {
+        _spritesheet* sprite = nullptr;
+        float lifetime = 3.0f;
+        float age = 0.0f;
+    };
+
+    std::vector<PortalEffect> portals;
 
     // HUD
     _hudIcon* heartIcon = new _hudIcon();
