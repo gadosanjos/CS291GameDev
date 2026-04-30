@@ -31,20 +31,46 @@ void _Enemy::update(float deltaT, const vec3& playerPos)
 
     float dist = sqrtf(dx * dx + dz * dz);
 
-    // only chase if not already extremely close
-    if (dist > 1.5f)
+    // -------------------------------
+    // State switching
+    // -------------------------------
+
+    if (state == IDLE)
+    {
+        if (dist <= startChaseDistance)
+        {
+            state = CHASE;
+            model->actionTrigger = model->RUN;
+        }
+        else
+        {
+            model->actionTrigger = model->STAND;
+            return;
+        }
+    }
+    else if (state == CHASE)
+    {
+        if (dist >= stopChaseDistance)
+        {
+            state = IDLE;
+            model->actionTrigger = model->STAND;
+            return;
+        }
+    }
+
+    // -------------------------------
+    // Chase behavior
+    // -------------------------------
+
+    if (state == CHASE && dist > stopNearPlayerDistance)
     {
         dx /= dist;
         dz /= dist;
 
         yaw = atan2f(dx, -dz) * 180.0f / (float)PI;
 
-        // move toward player if within chase range
-        if (dist < 25.0f)
-        {
-            pos.x += dx * moveSpeed * deltaT;
-            pos.z += dz * moveSpeed * deltaT;
-        }
+        pos.x += dx * moveSpeed * deltaT;
+        pos.z += dz * moveSpeed * deltaT;
     }
 }
 

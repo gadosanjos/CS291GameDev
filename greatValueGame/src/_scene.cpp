@@ -22,6 +22,7 @@ _Scene::~_Scene()
     delete myMusic;
     delete worldGround;
     delete player;
+    delete myCollision;
 
     for (size_t i = 0; i < enemies.size(); i++) {
         delete enemies[i];
@@ -199,6 +200,7 @@ void _Scene::drawScene()
     player->update(deltaT);
     updatePortals(deltaT);
     updateEnemies(deltaT);
+    separateEnemies();
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
 
     // --------------------------------------
@@ -300,6 +302,49 @@ void _Scene::drawEnemies()
 {
     for (size_t i = 0; i < enemies.size(); i++) {
         enemies[i]->draw();
+    }
+}
+
+void _Scene::separateEnemies()
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        for (size_t j = i + 1; j < enemies.size(); j++) {
+
+            _Enemy* a = enemies[i];
+            _Enemy* b = enemies[j];
+
+            if (!a->active || !b->active) {
+                continue;
+            }
+
+            if (myCollision->checkRadiusHit(a->pos, enemyRadius, b->pos, enemyRadius)) {
+
+                float dx = (float)(b->pos.x - a->pos.x);
+                float dz = (float)(b->pos.z - a->pos.z);
+
+                float distSq = dx * dx + dz * dz;
+
+                if (distSq <= 0.0001f) {
+                    a->pos.x += 0.1f;
+                    b->pos.x -= 0.1f;
+                    continue;
+                }
+
+                float dist = sqrtf(distSq);
+
+                float nx = dx / dist;
+                float nz = dz / dist;
+
+                float minDist = enemyRadius * 2.0f;
+                float overlap = minDist - dist;
+
+                a->pos.x -= nx * overlap * 0.5f;
+                a->pos.z -= nz * overlap * 0.5f;
+
+                b->pos.x += nx * overlap * 0.5f;
+                b->pos.z += nz * overlap * 0.5f;
+            }
+        }
     }
 }
 

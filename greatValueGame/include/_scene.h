@@ -12,6 +12,7 @@
 #include "_player.h"
 #include "_enemy.h"
 #include "_spritesheet.h"
+#include "_collision.h"
 #include <vector>
 
 class _Scene : public IScene
@@ -36,6 +37,7 @@ public:
     void drawText(float x, float y, const char* text, float scale);
 
     // mob helpers
+    void separateEnemies();
     void updateEnemies(float deltaT);
     void drawEnemies();
     void spawnEnemy(float x, float y, float z);
@@ -49,6 +51,7 @@ public:
     _skyBox* skyBox = new _skyBox();
     _camera* cam = new _camera();
     _sounds* myMusic = new _sounds();
+    _collision* myCollision = new _collision();
 
     // world objects
     _ground* worldGround = new _ground();
@@ -78,6 +81,7 @@ public:
     float camLookHeight = 1.5f;
 
     // misc scene state
+    float enemyRadius = 0.5f;
     float gameTimeRemaining = 300.0f; // 5 minutes in seconds
     bool gameOver = false;
     bool paused = false;
