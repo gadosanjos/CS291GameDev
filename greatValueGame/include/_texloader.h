@@ -9,6 +9,7 @@ class _texLoader
     public:
         _texLoader();
         virtual ~_texLoader();
+
         int width,height; //keep track of image dementions
         unsigned char* image;
         GLuint texID;
@@ -17,6 +18,8 @@ class _texLoader
         void BindTex();
 
     protected:
+        bool loadPCXTexture(const char* fileName);
+        bool isPCXFile(const char* fileName);
 
     private:
 };

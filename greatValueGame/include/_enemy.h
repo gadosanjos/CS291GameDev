@@ -10,7 +10,7 @@ public:
     _Enemy();
     virtual ~_Enemy();
 
-    void init(const char* modelFile, char* textureFile);
+    void init(const char* modelFile, char* textureFile,const char* modelFileW, char* textureFileW);
     void update(float deltaT, const vec3& playerPos);
     void draw();
 
@@ -32,6 +32,8 @@ public:
     float stopNearPlayerDistance = 1.5f;
 
     _ModelLoaderMD2* model = new _ModelLoaderMD2();
+    _ModelLoaderMD2* modelWeapon = new _ModelLoaderMD2(); // waepon
+
 };
 
 #endif // _ENEMY_H

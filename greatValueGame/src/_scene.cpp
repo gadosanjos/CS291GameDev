@@ -24,14 +24,8 @@ _Scene::~_Scene()
     delete player;
     delete myCollision;
 
-    for (size_t i = 0; i < enemies.size(); i++) {
-        delete enemies[i];
-    }
-    enemies.clear();
-    for (size_t i = 0; i < portals.size(); i++) {
-        delete portals[i].sprite;
-    }
-    portals.clear();
+    clearEnemies();
+    clearPortals();
 }
 
 // ======================================================
@@ -92,15 +86,20 @@ GLint _Scene::initGL()
     exitPanel->height = 300.0f;
 
     // player model
-    player->init("models/Tekk/tris.md2", "models/Tekk/blade.jpg");
+    player->init("models/tekk-blade/tris.md2", "models/tekk-blade/blade_green.pcx", "models/tekk-blade/weapon.md2", "models/tekk-blade/blade_yellow.pcx");
     player->pos.x = 0.0f;
     player->pos.y = 0.0f;
     player->pos.z = 0.0f;
     player->yaw = 0.0f;
 
     // One enemy initialization so i dont forget
-    spawnPortals(0.0f, 0.0f, -20.0f);
-    spawnEnemy(0.0f, 0.0f, -20.0f);
+    spawnPortals(0.0f, 0.0f, -20.0f, 1);
+    spawnEnemy(0.0f, 0.0f, -20.0f, dragonknight);
+    spawnEnemy(-10.0f, 0.0f, -20.0f, knight);
+    spawnEnemy(10.0f, 0.0f, -20.0f, zealot);
+    //spawnEnemy(-20.0f, 0.0f, -20.0f, werewolf1);
+    //spawnEnemy(20.0f, 0.0f, -20.0f, werewolf2);
+    //spawnEnemy(-30.0f, 0.0f, -20.0f, wolf);
 
     // world ground
     worldGround->modelInit("images/jungleScene/jungle_road.png");
@@ -181,11 +180,16 @@ void _Scene::drawScene()
     // --------------------------------------
 
     if(player->playerLives <= 0){
+        player->setDeath(true);
         gameOver = true;
     }
     if(gameOver){
-        drawGameOverHUD();
-        return;
+        deathAnimationPeriod -= deltaT;
+        if(deathAnimationPeriod <= 0){
+            deathAnimationPeriod = 0;
+            drawGameOverHUD();
+            return;
+        }
     } else if(player->playerLives >= 10){
         manager->requestSceneChange(new _SceneVirtualWorld());
     }
@@ -193,8 +197,8 @@ void _Scene::drawScene()
         pausedHUD();
         return;
     }
-    if(enemies.size() < 25){
-        randomizeEnemySpawnPositions(player->pos, 10, 25);
+    if(enemies.size() < 10){
+        randomizeEnemySpawnPositions(player->pos, 10, 25, gameTimeRemaining);
     }
 
     player->update(deltaT);
@@ -228,7 +232,7 @@ void _Scene::drawWorld()
 // ======================================================
 // Mob helpers
 // ======================================================
-void _Scene::randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance)
+void _Scene::randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance, float timeRemaining)
 {
     float angle = ((float)rand() / RAND_MAX) * 2.0f * (float)PI;
     float radius = minDistance + ((float)rand() / RAND_MAX) * distanceRange;
@@ -236,16 +240,32 @@ void _Scene::randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int
     float spawnX = playerPos.x + cosf(angle) * radius;
     float spawnZ = playerPos.z + sinf(angle) * radius;
 
-    spawnPortals(spawnX, 0.0f, spawnZ-1);
-    spawnEnemy(spawnX, 0.0f, spawnZ);
+    spawnPortals(spawnX, 0.0f, spawnZ-1, 0);
+    spawnEnemy(spawnX, 0.0f, spawnZ, 1);
+
+    if(timeRemaining <= 60.0f){
+        spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
+        spawnEnemy(spawnX/2, 0.0f, spawnZ, dragonknight);
+    } else if (timeRemaining <= 120.f){
+        spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
+        spawnEnemy(spawnX/2, 0.0f, spawnZ, zealot);
+    } else if (timeRemaining <= 180.f){
+        spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
+        spawnEnemy(spawnX/2, 0.0f, spawnZ, werewolf1);
+    }
+
 }
 
-void _Scene::spawnPortals(float x, float y, float z)
+void _Scene::spawnPortals(float x, float y, float z, int portalCollor)
 {
     PortalEffect p;
 
     p.sprite = new _spritesheet();
-    p.sprite->spriteInit("images/blueportal.png", 1, 1);
+    if(portalCollor == 0){
+        p.sprite->spriteInit("images/blueportal.png", 1, 1);
+    } else {
+        p.sprite->spriteInit("images/orangeportal.png", 1, 1);
+    }
     p.sprite->pos.x = x;
     p.sprite->pos.y = y;
     p.sprite->pos.z = z;
@@ -260,10 +280,32 @@ void _Scene::spawnPortals(float x, float y, float z)
     portals.push_back(p);
 }
 
-void _Scene::spawnEnemy(float x, float y, float z)
+void _Scene::spawnEnemy(float x, float y, float z, int mobSelection)
 {
     _Enemy* e = new _Enemy();
-    e->init("models/Tekk/tris.md2", "models/Tekk/blade.jpg");
+    switch(mobSelection){
+        case dragonknight:
+            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_ogre.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/dragon_ogre.pcx");
+            break;
+        case knight:
+            e->init("models/knight/tris.md2", "models/knight/BS.pcx", "models/knight/weapon.md2", "models/knight/BS.pcx");
+            break;
+        case zealot:
+            e->init("models/zealot/tris.md2", "models/zealot/Ctf_b.PCX", "models/zealot/weapon.md2", "models/zealot/Ctf_r.PCX");
+            break;
+        case werewolf1:
+            e->init("models/wolves/werewolf1/tris.md2", "models/wolves/werewolf1/rage.pcx", "models/wolves/werewolf1/weapon.md2", "models/wolves/werewolf1/rage.pcx");
+            break;
+        case werewolf2:
+            e->init("models/wolves/werewolf2/tris.md2", "models/wolves/werewolf2/werewolf.pcx", "models/wolves/werewolf2/weapon.md2", "models/wolves/werewolf2/werewolf.pcx");
+            break;
+        case wolf:
+            e->init("models/wolves/wolf/tris.md2", "models/wolves/wolf/Anya.pcx", "models/wolves/wolf/w_bfg.md2", "models/wolves/wolf/W_bfg.pcx");
+            break;
+        default:
+            break;
+
+    }
     e->pos.x = x;
     e->pos.y = y;
     e->pos.z = z;
@@ -348,6 +390,24 @@ void _Scene::separateEnemies()
     }
 }
 
+void _Scene::clearEnemies()
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        delete enemies[i];
+    }
+
+    enemies.clear();
+}
+
+void _Scene::clearPortals()
+{
+    for (size_t i = 0; i < portals.size(); i++) {
+        delete portals[i].sprite;
+        portals[i].sprite = nullptr;
+    }
+
+    portals.clear();
+}
 // ======================================================
 // Input
 // ======================================================
@@ -386,6 +446,8 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     break;
                 case 'P':
                     paused = true;
+                case 'L':
+                    player->playerLives = 0;
                 default:
                     break;
             }
@@ -419,6 +481,9 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             break;
         case WM_LBUTTONDOWN:
+            if(!gameOver || paused){
+                player->setAttack(true);
+            }
             if(gameOver){
                 float mouseX = (float)LOWORD(lParam);
                 float mouseY = (float)HIWORD(lParam);
@@ -509,6 +574,8 @@ void _Scene::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
         case WM_MBUTTONDOWN: break;
         case WM_LBUTTONUP:
+            player->setAttack(false);
+            break;
         case WM_RBUTTONUP:
         case WM_MBUTTONUP:
             break;
@@ -594,10 +661,26 @@ void _Scene::pausedHUD()
 void _Scene::resetGame()
 {
     player->playerLives = 5;
-    gameOver = false;
-    gameTimeRemaining = 300.0f;
+    player->setDeath(false);
+    player->setAttack(false);
 
-    player->pos.x = 100;
+    gameOver = false;
+    paused = false;
+
+    gameTimeRemaining = 300.0f;
+    deathAnimationPeriod = 3.0f;
+
+    player->pos.x = 0.0f;
+    player->pos.y = 0.0f;
+    player->pos.z = 0.0f;
+    player->yaw = 0.0f;
+
+    clearEnemies();
+    clearPortals();
+
+    // Optional: spawn a starter enemy again
+    spawnPortals(0.0f, 0.0f, -20.0f, 1);
+    spawnEnemy(0.0f, 0.0f, -20.0f, dragonknight);
 
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
 }

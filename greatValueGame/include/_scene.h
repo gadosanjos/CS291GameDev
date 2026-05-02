@@ -40,11 +40,13 @@ public:
     void separateEnemies();
     void updateEnemies(float deltaT);
     void drawEnemies();
-    void spawnEnemy(float x, float y, float z);
-    void spawnPortals(float x, float y, float z);
+    void spawnEnemy(float x, float y, float z, int selection);
+    void spawnPortals(float x, float y, float z, int portalCollor);
     void updatePortals(float deltaT);
     void drawPortals();
-    void randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance);
+    void randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance, float timeRemaining);
+    void clearEnemies();
+    void clearPortals();
 
     // scene systems
     _lighting* myLight = new _lighting();
@@ -81,6 +83,7 @@ public:
     float camLookHeight = 1.5f;
 
     // misc scene state
+    float deathAnimationPeriod = 3.0f;
     float enemyRadius = 0.5f;
     float gameTimeRemaining = 300.0f; // 5 minutes in seconds
     bool gameOver = false;
@@ -91,6 +94,7 @@ public:
 
 private:
     std::chrono::steady_clock::time_point lastTime;
+    enum {dragonknight, knight, zealot, werewolf1, werewolf2, wolf} mobSelection;
 };
 
 #endif // _SCENE_H

@@ -14,12 +14,16 @@ _Enemy::_Enemy()
 _Enemy::~_Enemy()
 {
     delete model;
+    delete modelWeapon;
 }
 
-void _Enemy::init(const char* modelFile, char* textureFile)
+void _Enemy::init(const char* modelFile, char* textureFile, const char* modelFileW, char* textureFileW)
 {
     model->initModel(modelFile, textureFile);
     model->actionTrigger = model->RUN;
+
+    modelWeapon->initModel(modelFileW, textureFileW);
+    modelWeapon->actionTrigger = model->actionTrigger;
 }
 
 void _Enemy::update(float deltaT, const vec3& playerPos)
@@ -41,10 +45,12 @@ void _Enemy::update(float deltaT, const vec3& playerPos)
         {
             state = CHASE;
             model->actionTrigger = model->RUN;
+            modelWeapon->actionTrigger = model->actionTrigger;
         }
         else
         {
             model->actionTrigger = model->STAND;
+            modelWeapon->actionTrigger = model->actionTrigger;
             return;
         }
     }
@@ -54,6 +60,7 @@ void _Enemy::update(float deltaT, const vec3& playerPos)
         {
             state = IDLE;
             model->actionTrigger = model->STAND;
+            modelWeapon->actionTrigger = model->actionTrigger;
             return;
         }
     }
@@ -87,5 +94,9 @@ void _Enemy::draw()
 
         model->actions();
         model->Draw();
+
+        modelWeapon->actionTrigger = model->actionTrigger;
+        modelWeapon->actions();
+        modelWeapon->Draw();
     glPopMatrix();
 }

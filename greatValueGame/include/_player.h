@@ -10,7 +10,7 @@ public:
     _Player();
     virtual ~_Player();
 
-    void init(const char* modelFile, char* textureFile);
+    void init(const char* modelFile, char* textureFile,const char* modelFileW, char* textureFileW);
     void update(float deltaT);
     void draw();
 
@@ -19,6 +19,8 @@ public:
     void setMoveBackward(bool value);
     void setTurnLeft(bool value);
     void setTurnRight(bool value);
+    void setAttack(bool value);
+    void setDeath(bool value);
 
     // Movement
     vec3 pos;
@@ -31,8 +33,11 @@ public:
     enum STATE {IDLE,RUN ,ATTACK, JUMP};
 
     _ModelLoaderMD2* model = new _ModelLoaderMD2();
+    _ModelLoaderMD2* modelWeapon = new _ModelLoaderMD2(); // waepon
 
 private:
+    bool dead = false;
+    bool attack = false;
     bool moveForward = false;
     bool moveBackward = false;
     bool turnLeft = false;

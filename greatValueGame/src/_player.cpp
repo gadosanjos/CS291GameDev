@@ -14,16 +14,27 @@ _Player::_Player()
 _Player::~_Player()
 {
     delete model;
+    delete modelWeapon;
 }
 
-void _Player::init(const char* modelFile, char* textureFile)
+void _Player::init(const char* modelFile, char* textureFile, const char* modelFileW, char* textureFileW)
 {
     model->initModel(modelFile, textureFile);
     model->actionTrigger = model->STAND;
+
+    modelWeapon->initModel(modelFileW, textureFileW);
+    modelWeapon->actionTrigger = model->actionTrigger;
 }
 
 void _Player::update(float deltaT)
 {
+    // Death should override everything.
+    if (dead) {
+        model->actionTrigger = model->DEATH;
+        modelWeapon->actionTrigger = model->actionTrigger;
+        return;
+    }
+
     if (turnLeft) {
         yaw += turnSpeed * deltaT;
     }
@@ -37,21 +48,31 @@ void _Player::update(float deltaT)
     float forwardX = sinf(yawRad);
     float forwardZ = -cosf(yawRad);
 
-    if (moveForward) {
-        pos.x += forwardX * moveSpeed * deltaT;
-        pos.z += forwardZ * moveSpeed * deltaT;
+    bool isMoving = moveForward || moveBackward;
+
+    if (!attack) {
+        if (moveForward) {
+            pos.x += forwardX * moveSpeed * deltaT;
+            pos.z += forwardZ * moveSpeed * deltaT;
+        }
+
+        if (moveBackward) {
+            pos.x -= forwardX * moveSpeed * deltaT;
+            pos.z -= forwardZ * moveSpeed * deltaT;
+        }
     }
 
-    if (moveBackward) {
-        pos.x -= forwardX * moveSpeed * deltaT;
-        pos.z -= forwardZ * moveSpeed * deltaT;
+    if (attack) {
+        model->actionTrigger = model->ATTACK;
     }
-
-    if (moveForward || moveBackward) {
+    else if (isMoving) {
         model->actionTrigger = model->RUN;
-    } else {
+    }
+    else {
         model->actionTrigger = model->STAND;
     }
+
+    modelWeapon->actionTrigger = model->actionTrigger;
 }
 
 void _Player::draw()
@@ -65,6 +86,13 @@ void _Player::draw()
 
         model->actions();
         model->Draw();
+
+        modelWeapon->actionTrigger = model->actionTrigger;
+        modelWeapon->actions();
+
+        // Weapon uses the body's exact frame/interpolation.
+        modelWeapon->DrawAtFrame(model->currentFrame, model->frameInterp);
+
     glPopMatrix();
 }
 
@@ -86,4 +114,12 @@ void _Player::setTurnLeft(bool value)
 void _Player::setTurnRight(bool value)
 {
     turnRight = value;
+}
+
+void _Player::setAttack(bool value){
+    attack = value;
+}
+
+void _Player::setDeath(bool value){
+    dead = value;
 }
