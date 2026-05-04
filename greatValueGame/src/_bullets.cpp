@@ -2,109 +2,104 @@
 
 _bullets::_bullets()
 {
-    //ctor
+    scale.x = 2.0;
+    scale.y = 2.0;
+    scale.z = 2.0;
 
-    bpos.x = 0;
-    bpos.y = -0.4;
-    bpos.z =-7;
+    pos.x = 0.0;
+    pos.y = 0.0;
+    pos.z = 0.0;
 
-    brot.x =0;
-    brot.y = 0;
-    brot.z =0;
+    start.x = 0.0;
+    start.y = 0.0;
+    start.z = 0.0;
 
-    bscale.x = 0.2;
-    bscale.y = 0.2;
-    bscale.z = 1.0;
+    dest.x = 0.0;
+    dest.y = 0.0;
+    dest.z = 0.0;
+
+    isLive = false;
+    actrigger = IDLE;
+
+    timer = 0.0f;
+    deltaT = 0.0f;
+    t = 0.0f;
 }
 
 _bullets::~_bullets()
 {
-    //dtor
-}
-void _bullets::initBlt(int x, int y, char* fileName)
-{
-    /*initQuad(fileName);
-    xFrames =x;
-    yFrames =y;
-
-    xMin =0;
-    xMax =1.0/(float)xFrames;
-    yMax =1.0/(float)yFrames;
-    yMin =0;
-    */
+    delete p;
+    p = nullptr;
 }
 
-void _bullets::update(vec3 pos)
+void _bullets::initBlt(vec3 pPos, char* fileName, char* modelName, char* pFileName)
 {
-
+    pos = pPos;
+    modelInit(fileName, modelName);
+    p->initparticles(pFileName);
 }
 
-void _bullets::shoot(vec3 spos, vec3 dpos, float deltaT)
+void _bullets::shoot(vec3 sPos, vec3 dPos, float time)
 {
-   if(actionTrigger==IDLE)
-   {
-       dest= dpos;
+    deltaT = time;
 
-       // angle between two point
-       // arccos(dot product of the points
+    if (actrigger == IDLE) {
+        start = sPos;
+        dest = dPos;
+    }
 
-       float X = -spos.x + dest.x;
-       float Y = -spos.y + dest.y;
+    if (isLive) {
+        timer += time;
 
-       dest.x>=0?brot.z =(atan(Y/X)*180/PI)+90:brot.z = ((atan(Y/X)*180/PI)-90);
-   }
+        if (timer > 0.06f) {
+            pos.x = start.x + t * (dest.x - start.x);
+            pos.y = start.y + t * (dest.y - start.y);
+            pos.z = start.z + t * (dest.z - start.z);
 
-   if(isLive)
-   {
-       timer +=deltaT;
-       if(timer>0.06)
-       {
+            if (actrigger == ACTIVE) {
+                if (t >= 1.0f) {
+                    t = 0.0f;
+                    actrigger = HIT;
+                    isLive = false;
+                }
+                else {
+                    t += time + 0.1f;
+                }
+            }
 
-         bpos.x = spos.x +t*(dest.x-spos.x);
-         bpos.y = spos.y +t*(dest.y-spos.y);
-         bpos.z = spos.z +t*(dest.z-spos.z);
-
-         if(actionTrigger == ACTIVE)
-        {
-           if(t>=1) {t=0; actionTrigger = IDLE;} //reset the bullet
-           else t+= (deltaT+0.1);  // let buulet move on the path
+            timer = 0.0f;
         }
-
-       timer =0;
-       }
-   }
-}
-
-
-
-void _bullets::bulletActions()
-{
-  switch(actionTrigger)
-    {
-        case IDLE: isLive = false;
-
-             bpos.x =0;
-             bpos.y =-4;
-             bpos.z =-7;
-
-        break; // if bullet is in the storage
-        case ACTIVE: isLive= true;break; // bullet is on the move
-        case HIT: isLive = false; break; // when bullet hit the target or move out of bounce
-        default: break;
     }
 }
 
-void _bullets::drawBlt()
+void _bullets::bulletActions()
 {
-   if(isLive)
-    {
-        glDisable(GL_TEXTURE_2D);
-        glPushMatrix();
-        glTranslatef(bpos.x,bpos.y,bpos.z);
-        glutSolidTeapot(0.5);
-        glPopMatrix();
-        glEnable(GL_TEXTURE_2D);
- //  updateQuad();
- //  drawQuad();
+   switch(actrigger)
+   {
+       case IDLE: isLive = false; // avoid render
+            break;
+       case ACTIVE: isLive = true;
+            break;
+       case HIT: isLive = false;
+             p->generateP(pos.x,pos.y,pos.z);
+             p->lifetime(deltaT);
+             p->drawParticle();
+       break;
    }
+}
+
+bool _bullets::collision(vec3 s, vec3 d)
+{
+    // To Do: change radius dummy value of 0.4 to variable
+    // change threshold value to a variable
+  return (sqrt(pow(s.x-d.x, 2)+pow(s.y-d.y,2)+pow(s.z-d.z,2))- 0.4< 0.03);
+}
+
+void _bullets::drawBullet()
+{
+    if(isLive)
+    {
+      drawModel();
+    }
+
 }

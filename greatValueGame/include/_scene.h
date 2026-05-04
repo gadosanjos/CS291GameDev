@@ -14,6 +14,7 @@
 #include "_spritesheet.h"
 #include "_collision.h"
 #include <vector>
+#include "_bullets.h"
 
 class _Scene : public IScene
 {
@@ -35,6 +36,7 @@ public:
     void drawTimerHUD();
     void resetGame();
     void drawText(float x, float y, const char* text, float scale);
+    void checkEnemyPlayerDamage(float deltaT);
 
     // mob helpers
     void separateEnemies();
@@ -47,6 +49,12 @@ public:
     void randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance, float timeRemaining);
     void clearEnemies();
     void clearPortals();
+    void initMagicBullets();
+    _Enemy* findNearestEnemyInRange(float range);
+    void updateAutoMagic(float deltaT);
+    void updateMagicBullets(float deltaT);
+    void drawMagicBullets();
+    void removeDeadEnemies();
 
     // scene systems
     _lighting* myLight = new _lighting();
@@ -65,8 +73,11 @@ public:
         float lifetime = 3.0f;
         float age = 0.0f;
     };
-
     std::vector<PortalEffect> portals;
+    static const int MAX_MAGIC_BULLETS = 20;
+    _bullets magicBullets[MAX_MAGIC_BULLETS];
+
+    int nextBulletIndex = 0;
 
     // HUD
     _hudIcon* heartIcon = new _hudIcon();
@@ -83,10 +94,16 @@ public:
     float camLookHeight = 1.5f;
 
     // misc scene state
+    float playerHitRadius = 1.0f;
+    float enemyAttackRadius = 1.2f;
+    float enemyDamageCooldown = 0.0f;
+    float enemyDamageCooldownTime = 1.0f;
+    int enemyContactDamage = 1;
     float deathAnimationPeriod = 3.0f;
     float enemyRadius = 0.5f;
     float gameTimeRemaining = 300.0f; // 5 minutes in seconds
     bool gameOver = false;
+    bool gameWin = false;
     bool paused = false;
     static float deltaT;
     float wWidth, wHeight;

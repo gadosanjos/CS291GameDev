@@ -1,29 +1,34 @@
 #ifndef _BULLETS_H
 #define _BULLETS_H
 
-#include<_common.h>
+#include <_common.h>
+#include <_modelvbo.h>
+#include <_particles.h>
 
-class _bullets
+class _bullets : public _modelVBO
 {
     public:
         _bullets();
         virtual ~_bullets();
 
-        bool isLive =false;  // check the bullet active or not
-        int actionTrigger=0;
+        bool isLive = false;
+        int actrigger =0;
         float timer;
-        float t=0; // fraction of distance in parametric equation
+        float deltaT=0;
+        float t =0; //parametric factor
+        vec3 dest; // destination of the bullet move
+        vec3 start;
 
-        enum {IDLE,ACTIVE,HIT};
+        enum {IDLE, ACTIVE,HIT};
 
-        void initBlt(int x, int y, char *fileName);
-        void update(vec3 pos);  // update bullet movements
-        void shoot(vec3,vec3,float);  // source and destination
-        void bulletActions();   // Address the bullet actions
-        void drawBlt();         // render bullets
+        void initBlt(vec3,char *, char*,char*);
+        void shoot(vec3,vec3,float);
+        void bulletActions();
+        void drawBullet();
 
-        vec3 dest; // to keep track of first destination of the bullet
-        vec3  bpos, brot, bscale;
+        bool collision(vec3, vec3);
+
+        _particles *p = new _particles();
 
     protected:
 

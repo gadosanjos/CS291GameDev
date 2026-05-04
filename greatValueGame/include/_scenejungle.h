@@ -1,137 +1,117 @@
 #ifndef _SCENEJUNGLE_H
 #define _SCENEJUNGLE_H
 
-#include<_common.h>
-#include<_lighting.h>
-#include<_model.h>
-#include<_inputs.h>
-#include<_modelvbo.h>
-#include<_texloader.h>
-#include<_skybox.h>
-#include<_camera.h>
-#include<_parallax.h>
-#include<_spritesheet.h>
-#include<_sounds.h>
-#include<_ModelLoaderMD2.h>
-#include<_bullets.h>
+#include <_common.h>
+#include <_lighting.h>
+#include <_skybox.h>
+#include <_camera.h>
+#include <_sounds.h>
 #include "iscene.h"
-#include "_ground.h"
-#include "_collision.h"
 #include "_hudicon.h"
+#include "_ground.h"
+#include "_player.h"
+#include "_enemy.h"
+#include "_spritesheet.h"
+#include "_collision.h"
+#include <vector>
+#include "_bullets.h"
 
 class _SceneJungle : public IScene
 {
-    public:
-        _SceneJungle();
-        virtual ~_SceneJungle();
+public:
+    _SceneJungle();
+    virtual ~_SceneJungle() override;
 
-        // IScene interface
-        GLint initGL() override;    // Initializing my game objects and opengl
-        void reSize(GLint,GLint) override; //window resizing
-        void drawScene() override;  //rendering the scene
-        void WndProc(
-              HWND	hWnd,			// Handle For This Window
-			  UINT	uMsg,			// Message For This Window
-			  WPARAM wParam,		// Additional Message Information
-			  LPARAM lParam) override;		// Additional Message Information
+    // IScene interface
+    GLint initGL() override;
+    void reSize(GLint width, GLint height) override;
+    void drawScene() override;
+    void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-        // game flow
-        void resetGame();
+    // scene helpers
+    void drawWorld();
+    void drawLivesHUD();
+    void drawGameOverHUD();
+    void pausedHUD();
+    void drawTimerHUD();
+    void resetGame();
+    void drawText(float x, float y, const char* text, float scale);
+    void checkEnemyPlayerDamage(float deltaT);
 
-        // world / gameplay helpers
-        void roadChunk(float deltaT);
-        void drawCoins(int chunkIndex);
-        void drawObstacles(int chunkIndex);
-        void generateChunkObstacles(int chunkIndex);
-        void clearChunkObstacles(int chunkIndex);
+    // mob helpers
+    void separateEnemies();
+    void updateEnemies(float deltaT);
+    void drawEnemies();
+    void spawnEnemy(float x, float y, float z, int selection);
+    void spawnPortals(float x, float y, float z, int portalCollor);
+    void updatePortals(float deltaT);
+    void drawPortals();
+    void randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance, float timeRemaining);
+    void clearEnemies();
+    void clearPortals();
+    void initMagicBullets();
+    _Enemy* findNearestEnemyInRange(float range);
+    void updateAutoMagic(float deltaT);
+    void updateMagicBullets(float deltaT);
+    void drawMagicBullets();
+    void removeDeadEnemies();
 
-        // HUD
-        void drawLivesHUD();
-        void drawCoinHUD();
-        void drawGameOverHUD();
-        void mouseMapping(int,int);
+    // scene systems
+    _lighting* myLight = new _lighting();
+    _skyBox* skyBox = new _skyBox();
+    _camera* cam = new _camera();
+    _sounds* myMusic = new _sounds();
+    _collision* myCollision = new _collision();
 
-        // chunk / lane constants
-        static const int LANES = 3;
-        static const int ROWS_PER_CHUNK = 6;
-        static const int NUM_ROAD_CHUNKS = 4;
+    // world objects
+    _ground* worldGround = new _ground();
+    _Player* player = new _Player();
+    std::vector<_Enemy*> enemies;
+    struct PortalEffect
+    {
+        _spritesheet* sprite = nullptr;
+        float lifetime = 3.0f;
+        float age = 0.0f;
+    };
+    std::vector<PortalEffect> portals;
+    static const int MAX_MAGIC_BULLETS = 20;
+    _bullets magicBullets[MAX_MAGIC_BULLETS];
 
-        // rendering / scene objects
-        _lighting *myLight = new _lighting(); // light class instance
-        _skyBox *skyBox = new _skyBox();
-        _camera *cam = new _camera();
-        _ground* road[NUM_ROAD_CHUNKS];
+    int nextBulletIndex = 0;
 
-        // player / gameplay visuals
-        _model *testCube = new _model();
-        _ModelLoaderMD2 *mdl= new _ModelLoaderMD2();
-        _ModelLoaderMD2 * mdlW = new _ModelLoaderMD2(); // waepon
-        _modelVBO *box= new _modelVBO();
-        _spritesheet *coinSprite = new _spritesheet();
-        _bullets blts[20];
+    // HUD
+    _hudIcon* heartIcon = new _hudIcon();
+    _hudIcon* gameOverPanel = new _hudIcon();
+    _hudIcon* playAgainPanel = new _hudIcon();
+    _hudIcon* exitPanel = new _hudIcon();
+    _hudIcon* menuPanel = new _hudIcon();
+    _hudIcon* helpPanel = new _hudIcon();
+    _hudIcon* pausedPanel = new _hudIcon();
 
-        // systems / helpers
-        _inputs *keyMS  = new _inputs();
-        _sounds *myMusic = new _sounds();
-        _collision *myCollision = new _collision();
+    // camera follow settings
+    float camFollowDistance = 8.0f;
+    float camHeight = 4.0f;
+    float camLookHeight = 1.5f;
 
-        // HUD
-        _hudIcon* heartIcon = new _hudIcon();
-        _hudIcon* coinIcon = new _hudIcon();
-        _hudIcon* gameOverPanel = new _hudIcon();
-        _hudIcon* playAgainPanel = new _hudIcon();
-        _hudIcon* exitPanel = new _hudIcon();
+    // misc scene state
+    float playerHitRadius = 1.0f;
+    float enemyAttackRadius = 1.2f;
+    float enemyDamageCooldown = 0.0f;
+    float enemyDamageCooldownTime = 1.0f;
+    int enemyContactDamage = 1;
+    float deathAnimationPeriod = 3.0f;
+    float enemyRadius = 0.5f;
+    float gameTimeRemaining = 300.0f; // 5 minutes in seconds
+    bool gameOver = false;
+    bool gameWin = false;
+    bool paused = false;
+    static float deltaT;
+    float wWidth, wHeight;
+    char* song = "sounds/Conspiracy Theory.mp3";
 
-        // Game state
-        int playerLives = 5;
-        int coinCount = 0;
-        bool gameOver = false;
-        float playerZ = 0.0f;     // player is fixed at 0
-        float hitDistance = 1.0f; // tweak by testing
-        int clickCount =0;
-
-        enum Lane {LEFT,MIDDLE,RIGHT};
-        Lane currentPlayerLane = MIDDLE;
-        float laneX[3] = { -2.5f, 0.0f, 2.5f }; //mapping to x pos
-
-        // road / movement state
-        float speed = 18.0f;
-        float recyclePoint = 30.0f;
-        float roadChunkLength = 30.0f;
-        int numRoadChunks = NUM_ROAD_CHUNKS;
-        float totalLoopLength = roadChunkLength * numRoadChunks;
-        float rowSpacing = 6.0f;
-
-        // Obstacle management
-        struct ChunkObstacleData
-        {
-            int grid[ROWS_PER_CHUNK][LANES];
-        };
-        // generated obstacle data per chunk
-        ChunkObstacleData chunkObstacles[NUM_ROAD_CHUNKS];
-        // prevent multiple hits from the same obstacle
-        bool obstacleHit[NUM_ROAD_CHUNKS][ROWS_PER_CHUNK][LANES] = {};
-        bool coinCollected[NUM_ROAD_CHUNKS][ROWS_PER_CHUNK][LANES] = {};
-
-        // debug / Temp
-        // 0 empty
-        // 1 obstacle
-        // 2 coin
-        void drawTestObstacles(int chunkIndex);
-        int testGrid[ROWS_PER_CHUNK][LANES] = {
-            {0, 1, 0},
-            {0, 0, 0},
-            {1, 0, 0},
-            {0, 0, 1}
-        };
-
-        // misc scene state
-        static float deltaT;
-        float wWidth, wHeight;
-        vec3 mouse;
-        char* song = "sounds/Final Boss Battle.mp3";
-    protected:
-    private:
-        std::chrono::steady_clock::time_point lastTime;
+private:
+    std::chrono::steady_clock::time_point lastTime;
+    enum {dragonknight, knight, zealot, werewolf1, werewolf2, wolf} mobSelection;
 };
-#endif // _SCENEJUNGLE_H
+
+#endif // _SceneJungle_H

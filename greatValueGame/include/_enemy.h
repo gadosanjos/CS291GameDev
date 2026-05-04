@@ -14,6 +14,12 @@ public:
     void update(float deltaT, const vec3& playerPos);
     void draw();
 
+    int health = 3;
+    bool dead = false;
+
+    void setHealth(int amount);
+    void takeDamage(int amount);
+
     enum EnemyState
     {
         IDLE,

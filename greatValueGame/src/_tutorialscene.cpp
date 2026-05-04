@@ -153,15 +153,15 @@ vec2 _TutorialScene::getAnchorPosition(UIAnchor anchor, float screenWidth, float
 
     switch (anchor)
     {
-        case TOP_LEFT:    p.x = screenWidth * 0.2f; p.y = screenHeight * 0.15f; break;
-        case TOP_CENTER:  p.x = screenWidth * 0.5f; p.y = screenHeight * 0.15f; break;
-        case TOP_RIGHT:   p.x = screenWidth * 0.8f; p.y = screenHeight * 0.15f; break;
-        case MID_LEFT:    p.x = screenWidth * 0.2f; p.y = screenHeight * 0.5f;  break;
-        case MID_CENTER:  p.x = screenWidth * 0.5f; p.y = screenHeight * 0.5f;  break;
-        case MID_RIGHT:   p.x = screenWidth * 0.8f; p.y = screenHeight * 0.5f;  break;
-        case BOT_LEFT:    p.x = screenWidth * 0.2f; p.y = screenHeight * 0.85f; break;
-        case BOT_CENTER:  p.x = screenWidth * 0.5f; p.y = screenHeight * 0.85f; break;
-        case BOT_RIGHT:   p.x = screenWidth * 0.8f; p.y = screenHeight * 0.85f; break;
+        case TOP_LEFT:    p.u = screenWidth * 0.2f; p.v = screenHeight * 0.15f; break;
+        case TOP_CENTER:  p.u = screenWidth * 0.5f; p.v = screenHeight * 0.15f; break;
+        case TOP_RIGHT:   p.u = screenWidth * 0.8f; p.v = screenHeight * 0.15f; break;
+        case MID_LEFT:    p.u = screenWidth * 0.2f; p.v = screenHeight * 0.5f;  break;
+        case MID_CENTER:  p.u = screenWidth * 0.5f; p.v = screenHeight * 0.5f;  break;
+        case MID_RIGHT:   p.u = screenWidth * 0.8f; p.v = screenHeight * 0.5f;  break;
+        case BOT_LEFT:    p.u = screenWidth * 0.2f; p.v = screenHeight * 0.85f; break;
+        case BOT_CENTER:  p.u = screenWidth * 0.5f; p.v = screenHeight * 0.85f; break;
+        case BOT_RIGHT:   p.u = screenWidth * 0.8f; p.v = screenHeight * 0.85f; break;
     }
 
     return p;
@@ -172,8 +172,8 @@ vec2 _TutorialScene::getButtonPosition(const MenuButton& button, float screenWid
     vec2 base = getAnchorPosition(button.anchor, screenWidth, screenHeight);
 
     vec2 finalPos{};
-    finalPos.x = base.x + button.offsetX;
-    finalPos.y = base.y + button.offsetY;
+    finalPos.u = base.u + button.offsetX;
+    finalPos.v = base.v + button.offsetY;
 
     return finalPos;
 }
@@ -182,8 +182,8 @@ void _TutorialScene::drawMenuButton(MenuButton& button, float screenWidth, float
 {
     vec2 pos = getButtonPosition(button, screenWidth, screenHeight);
 
-    button.icon->pos.x = pos.x;
-    button.icon->pos.y = pos.y;
+    button.icon->pos.x = pos.u;
+    button.icon->pos.y = pos.v;
     button.icon->width = button.width;
     button.icon->height = button.height;
 
@@ -194,10 +194,10 @@ bool _TutorialScene::isMouseOverButton(const MenuButton& button, float mouseX, f
 {
     vec2 pos = getButtonPosition(button, screenWidth, screenHeight);
 
-    float left   = pos.x - button.width * 0.5f;
-    float right  = pos.x + button.width * 0.5f;
-    float top    = pos.y - button.height * 0.5f;
-    float bottom = pos.y + button.height * 0.5f;
+    float left   = pos.u - button.width * 0.5f;
+    float right  = pos.u + button.width * 0.5f;
+    float top    = pos.v - button.height * 0.5f;
+    float bottom = pos.v + button.height * 0.5f;
 
     return mouseX >= left && mouseX <= right &&
            mouseY >= top  && mouseY <= bottom;

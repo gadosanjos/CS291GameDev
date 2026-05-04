@@ -1,15 +1,16 @@
-#include "_scenejungle.h"
-#include "_scenevirtualworld.h"
-#include "_scene.h"
+#include "_SceneJungle.h"
 #include "scenemanager.h"
 #include "_menuscene.h"
+#include "_tutorialscene.h"
+#include "_pausedscene.h"
+#include <cmath>
 
 // ======================================================
 // Construction / destruction
 // ======================================================
+
 _SceneJungle::_SceneJungle()
 {
-    //ctor
     lastTime = chrono::steady_clock::now();
 }
 
@@ -18,22 +19,13 @@ _SceneJungle::~_SceneJungle()
     delete myLight;
     delete skyBox;
     delete cam;
-    delete testCube;
-    delete mdl;
-    delete mdlW;
-    delete box;
-    delete coinSprite;
-    delete keyMS;
     delete myMusic;
+    delete worldGround;
+    delete player;
     delete myCollision;
-    delete heartIcon;
-    delete coinIcon;
-    delete gameOverPanel;
 
-    for (int i = 0; i < NUM_ROAD_CHUNKS; i++) {
-        delete road[i];
-        road[i] = nullptr;
-    }
+    clearEnemies();
+    clearPortals();
 }
 
 // ======================================================
@@ -47,8 +39,8 @@ GLint _SceneJungle::initGL()
     wWidth  = GetSystemMetrics(SM_CXSCREEN);
     wHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    glClearColor(0.77,0.63,0.44,1.0); // setting background color
-    glClearDepth(1.0);
+    glClearColor(0.35f, 0.55f, 0.75f, 1.0f);
+    glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
@@ -60,87 +52,88 @@ GLint _SceneJungle::initGL()
 
     myMusic->iniSounds();
     Sleep(250);
-    myMusic->playMusic(_SceneJungle::song);
+    myMusic->playMusic(song);
 
+    // skybox
     skyBox->boxInit();
-    skyBox->myTex[0].loadTexture("images/jungleScene/back.png");
-    skyBox->myTex[1].loadTexture("images/jungleScene/back.png");
-    skyBox->myTex[2].loadTexture("images/jungleScene/back.png");
-    skyBox->myTex[3].loadTexture("images/jungleScene/back.png");
-    skyBox->myTex[4].loadTexture("images/jungleScene/back.png");
-    skyBox->myTex[5].loadTexture("images/jungleScene/back.png");
-    Sleep(250);
-
+    skyBox->myTex[0].loadTexture("images/back.bmp");
+    skyBox->myTex[1].loadTexture("images/front.bmp");
+    skyBox->myTex[2].loadTexture("images/top.bmp");
+    skyBox->myTex[3].loadTexture("images/bottom.bmp");
+    skyBox->myTex[4].loadTexture("images/left.bmp");
+    skyBox->myTex[5].loadTexture("images/right.bmp");
+    // HUD
     heartIcon->initIcon("images/heart.png");
     heartIcon->width = 60.0f;
     heartIcon->height = 60.0f;
+    gameOverPanel->initIcon("images/menu/gameover.png");
+    gameOverPanel->width = 1000.0f;
+    gameOverPanel->height = 520.0f;
+    pausedPanel->initIcon("images/menu/gameover.png");
+    pausedPanel->width = 1000.0f;
+    pausedPanel->height = 520.0f;
+    playAgainPanel->initIcon("images/menu/newgame.png");
+    playAgainPanel->width = 500.0f;
+    playAgainPanel->height = 300.0f;
+    helpPanel->initIcon("images/menu/tutorial.png");
+    helpPanel->width = 500.0f;
+    helpPanel->height = 300.0f;
+    menuPanel->initIcon("images/menu/menu.png");
+    menuPanel->width = 500.0f;
+    menuPanel->height = 300.0f;
+    exitPanel->initIcon("images/menu/exit.png");
+    exitPanel->width = 500.0f;
+    exitPanel->height = 300.0f;
 
-    coinSprite->spriteInit("images/coin.png", 12, 1); // example: 6 frames in 1 row
-    coinSprite->actionTrigger = coinSprite->WALKLEFT; // temporary reuse solution
-    coinSprite->scale.x = 0.6f;
-    coinSprite->scale.y = 0.6f;
-    Sleep(250);
+    // player model
+    player->init("models/tekk-blade/tris.md2", "models/tekk-blade/blade_green.pcx", "models/tekk-blade/weapon.md2", "models/tekk-blade/blade_yellow.pcx");
+    player->pos.x = 0.0f;
+    player->pos.y = 0.0f;
+    player->pos.z = 0.0f;
+    player->yaw = 0.0f;
 
-    coinIcon->initIcon("images/coins.png");
-    coinIcon->width = 60.0f;
-    coinIcon->height = 60.0f;
-    gameOverPanel->initIcon("images/gameover.png");
-    gameOverPanel->width = 300.0f;
-    gameOverPanel->height = 120.0f;
-    playAgainPanel->initIcon("images/newgame.png");
-    playAgainPanel->width = 150.0f;
-    playAgainPanel->height = 60.0f;
-    exitPanel->initIcon("images/exit.png");
-    exitPanel->width = 150.0f;
-    exitPanel->height = 60.0f;
-    Sleep(250);
+    // One enemy initialization so i dont forget
+    spawnPortals(0.0f, 0.0f, -20.0f, 1);
+    spawnEnemy(0.0f, 0.0f, -20.0f, dragonknight);
+    spawnEnemy(-10.0f, 0.0f, -20.0f, knight);
+    spawnEnemy(10.0f, 0.0f, -20.0f, zealot);
+    //spawnEnemy(-20.0f, 0.0f, -20.0f, werewolf1);
+    //spawnEnemy(20.0f, 0.0f, -20.0f, werewolf2);
+    //spawnEnemy(-30.0f, 0.0f, -20.0f, wolf);
 
-    // Player
-    mdl->initModel("models/Tekk/tris.md2","models/Tekk/blade.jpg");
-    mdl->actionTrigger = mdl->RUN;
-    mdlW->initModel("models/Tekk/weapon.md2","models/Tekk/blade.jpg");
+    // world ground
+    worldGround->modelInit("images/jungleScene/jungle_road.png");
+    worldGround->scale.x = 100.0f;
+    worldGround->scale.z = 100.0f;
+    worldGround->pos.x = 0.0f;
+    worldGround->pos.y = -1.0f;
+    worldGround->pos.z = 0.0f;
 
-    box->modelInit("images/jungleScene/crate.png");
-    Sleep(250);
-    // Road
-    for(int i = 0; i < _SceneJungle::numRoadChunks; i++){
-        road[i] = new _ground();
-        //DEBUG FOR VISUALIZATION
-        if(i%2 == 0){
-            road[i]->modelInit("images/jungleScene/jungle_road.png");
-        } else {
-            road[i]->modelInit("images/jungleScene/jungle_road.png");
-            //road[i]->modelInit("images/crate.jpeg");
-        }
-        road[i]->pos.z -= (30*i);
+    // magic bullets / auto attack
+    initMagicBullets();
 
 
-        // Obstacles
-        // Make first chunk empty only at startup
-        if (i == 0 || i == 1) {
-            clearChunkObstacles(i);
-        } else {
-            generateChunkObstacles(i);
-        }
-    }
-    // Test cube
-    testCube->initModel("images/debug.jpg");
-
+    cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
+    //player->playerLives = 0; // game over debug
     return true;
 }
 
 void _SceneJungle::reSize(GLint width, GLint height)
 {
-    GLfloat aspectRatio = (GLfloat)width/(GLfloat)height;
-    glViewport(0,0,width,height); //adjusting the viewport
-    glMatrixMode(GL_PROJECTION);  //for perspective projection
+    wWidth = (float)width;
+    wHeight = (float)height;
+
+    GLfloat aspectRatio = (GLfloat)width / (GLfloat)height;
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(60,aspectRatio,0.1,2000);
+    gluPerspective(60, aspectRatio, 0.1, 2000);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
-float _SceneJungle::deltaT = 0;
+
+float _SceneJungle::deltaT = 0.0f;
 
 void _SceneJungle::drawScene()
 {
@@ -149,16 +142,33 @@ void _SceneJungle::drawScene()
     // --------------------------------------
 
     auto currentTime = chrono::steady_clock::now();
-
-    chrono::duration<float>elapsed = currentTime - lastTime;
+    chrono::duration<float> elapsed = currentTime - lastTime;
     _SceneJungle::deltaT = elapsed.count();
-    lastTime =currentTime;;
+    lastTime = currentTime;
+
+    // update game timer
+    if (!gameOver) {
+        if(paused){
+            //
+        } else {
+            gameTimeRemaining -= deltaT;
+        }
+
+        if (gameTimeRemaining <= 0.0f) {
+            gameTimeRemaining = 0.0f;
+            gameOver = true;
+        }
+    }
+
+    if(gameWin){
+        //manager->requestSceneChange(new _SceneJungle());
+    }
 
     // --------------------------------------
     // 2. clear frame and set camera
     // --------------------------------------
 
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
     cam->setUpCamera();
@@ -169,415 +179,604 @@ void _SceneJungle::drawScene()
 
     glPushMatrix();
         skyBox->drawBox();
-        skyBox->rot.x +=0.5;
     glPopMatrix();
 
+    drawWorld();
+
     // --------------------------------------
-    // 4. update and draw world
+    // 4. update
     // --------------------------------------
 
-    if (gameOver) {
-        drawGameOverHUD();
-        glPushMatrix();
-            //testCube->drawModel();
-            testCube->pos.x = laneX[currentPlayerLane];
-        glPopMatrix();
-
-        glPushMatrix();
-            glTranslatef(laneX[LEFT]*2, 0, -15);
-            glRotatef(-90,1,0,0);
-            glRotatef(270,0,0,1);
-            glScalef(0.3,0.3,0.3);
-            mdl->Draw();
-        glPopMatrix();
-
-        glPushMatrix();
-            glTranslatef(laneX[RIGHT]*2, 0, -15);
-            glRotatef(-90,1,0,0);
-            glRotatef(270,0,0,1);
-            glScalef(0.3,0.3,0.3);
-            mdl->Draw();
-        glPopMatrix();
+    if(player->playerLives <= 0){
+        player->setDeath(true);
+        gameOver = true;
+    }
+    if(gameOver){
+        deathAnimationPeriod -= deltaT;
+        if(deathAnimationPeriod <= 0){
+            deathAnimationPeriod = 0;
+            drawGameOverHUD();
+            return;
+        }
+    } else if(player->playerLives >= 10){
+        //manager->requestSceneChange(new _SceneJungleVirtualWorld());
+    }
+    if(paused){
+        pausedHUD();
         return;
-    } else if (coinCount == 25){
-        manager->requestSceneChange(new _Scene());
+    }
+    if(enemies.size() < 10){
+        randomizeEnemySpawnPositions(player->pos, 10, 25, gameTimeRemaining);
     }
 
-    // Move and draw road first
-    roadChunk(_SceneJungle::deltaT);
+    player->update(deltaT);
+    updatePortals(deltaT);
+    updateEnemies(deltaT);
+    separateEnemies();
+
+    checkEnemyPlayerDamage(deltaT);
+
+    updateAutoMagic(deltaT);
+    updateMagicBullets(deltaT);
+    removeDeadEnemies();
+
+    cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
 
     // --------------------------------------
     // 5. draw gameplay entities
     // --------------------------------------
 
-    // animate the coin sprite
-    coinSprite->spriteActions(deltaT);
+    player->draw();
+    drawPortals();
+    drawEnemies();
+    drawMagicBullets();
+}
 
-    // Then draw obstacles attached to the updated road positions
-    for (int i = 0; i < _SceneJungle::numRoadChunks; i++) {
-        //drawTestObstacles(i);
-        drawObstacles(i);
-        drawCoins(i);
+// ======================================================
+// Scene helpers
+// ======================================================
+
+void _SceneJungle::drawWorld(){
+    glPushMatrix();
+        worldGround->drawModel();
+        drawLivesHUD();
+        drawTimerHUD();
+    glPopMatrix();
+}
+
+void _SceneJungle::checkEnemyPlayerDamage(float deltaT){
+    // If player is already dead or game is paused, do not apply damage.
+    if (gameOver || paused) {
+        return;
     }
 
-    glPushMatrix();
-        //testCube->drawModel();
-        testCube->pos.x = laneX[currentPlayerLane];
-    glPopMatrix();
+    // Cooldown prevents damage every single frame.
+    if (enemyDamageCooldown > 0.0f) {
+        enemyDamageCooldown -= deltaT;
+    }
 
-    glPushMatrix();
-        glTranslatef(laneX[currentPlayerLane], 0, 0);
-        glRotatef(-90,1,0,0);
-        glRotatef(90,0,0,1);
-        glScalef(0.03,0.03,0.03);
-        mdl->actions();
-        mdl->Draw();
-        //mdlW->Draw();
-        //mdl->pos.x = laneX[currentPlayerLane]*10;
-        //mdlW->pos.x = laneX[currentPlayerLane];
-    glPopMatrix();
+    // If still cooling down, no new damage this frame.
+    if (enemyDamageCooldown > 0.0f) {
+        return;
+    }
 
-    // --------------------------------------
-    // 6. draw HUD
-    // --------------------------------------
+    for (size_t i = 0; i < enemies.size(); i++) {
+        _Enemy* enemy = enemies[i];
 
-    drawLivesHUD();
-    drawCoinHUD();
+        if (!enemy->active || enemy->dead) {
+            continue;
+        }
 
-    // --------------------------------------
-    // 7. draw game over overlay
-    // --------------------------------------
+        bool touchingPlayer = myCollision->checkRadiusHit(
+            player->pos,
+            playerHitRadius,
+            enemy->pos,
+            enemyAttackRadius
+        );
+
+        if (touchingPlayer) {
+            player->playerLives -= enemyContactDamage;
+
+            if (player->playerLives < 0) {
+                player->playerLives = 0;
+            }
+
+            enemyDamageCooldown = enemyDamageCooldownTime;
+
+            cout << "Player hit by enemy! Lives: "
+                 << player->playerLives << endl;
+
+            break;
+        }
+    }
 }
+
+// ======================================================
+// Mob helpers
+// ======================================================
+void _SceneJungle::randomizeEnemySpawnPositions(vec3 playerPos, int distanceRange, int minDistance, float timeRemaining)
+{
+    float angle = ((float)rand() / RAND_MAX) * 2.0f * (float)PI;
+    float radius = minDistance + ((float)rand() / RAND_MAX) * distanceRange;
+
+    float spawnX = playerPos.x + cosf(angle) * radius;
+    float spawnZ = playerPos.z + sinf(angle) * radius;
+
+    spawnPortals(spawnX, 0.0f, spawnZ-1, 0);
+    spawnEnemy(spawnX, 0.0f, spawnZ, 1);
+
+    if(timeRemaining <= 60.0f){
+        spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
+        spawnEnemy(spawnX/2, 0.0f, spawnZ, dragonknight);
+    } else if (timeRemaining <= 120.f){
+        spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
+        spawnEnemy(spawnX/2, 0.0f, spawnZ, zealot);
+    } else if (timeRemaining <= 180.f){
+        spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
+        spawnEnemy(spawnX/2, 0.0f, spawnZ, werewolf1);
+    }
+
+}
+
+void _SceneJungle::spawnPortals(float x, float y, float z, int portalCollor)
+{
+    PortalEffect p;
+
+    p.sprite = new _spritesheet();
+    if(portalCollor == 0){
+        p.sprite->spriteInit("images/blueportal.png", 1, 1);
+    } else {
+        p.sprite->spriteInit("images/orangeportal.png", 1, 1);
+    }
+    p.sprite->pos.x = x;
+    p.sprite->pos.y = y;
+    p.sprite->pos.z = z;
+
+    p.sprite->scale.x = 2.0f;
+    p.sprite->scale.y = 2.0f;
+    p.sprite->scale.z = 1.0f;
+
+    p.lifetime = 3.0f; // portal stays for 3 seconds
+    p.age = 0.0f;
+
+    portals.push_back(p);
+}
+
+void _SceneJungle::spawnEnemy(float x, float y, float z, int mobSelection)
+{
+    _Enemy* e = new _Enemy();
+    switch(mobSelection){
+        case dragonknight:
+            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_ogre.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/dragon_ogre.pcx");
+            break;
+        case knight:
+            e->init("models/knight/tris.md2", "models/knight/BS.pcx", "models/knight/weapon.md2", "models/knight/BS.pcx");
+            break;
+        case zealot:
+            e->init("models/zealot/tris.md2", "models/zealot/Ctf_b.PCX", "models/zealot/weapon.md2", "models/zealot/Ctf_r.PCX");
+            break;
+        case werewolf1:
+            e->init("models/wolves/werewolf1/tris.md2", "models/wolves/werewolf1/rage.pcx", "models/wolves/werewolf1/weapon.md2", "models/wolves/werewolf1/rage.pcx");
+            break;
+        case werewolf2:
+            e->init("models/wolves/werewolf2/tris.md2", "models/wolves/werewolf2/werewolf.pcx", "models/wolves/werewolf2/weapon.md2", "models/wolves/werewolf2/werewolf.pcx");
+            break;
+        case wolf:
+            e->init("models/wolves/wolf/tris.md2", "models/wolves/wolf/Anya.pcx", "models/wolves/wolf/w_bfg.md2", "models/wolves/wolf/W_bfg.pcx");
+            break;
+        default:
+            break;
+
+    }
+    e->pos.x = x;
+    e->pos.y = y;
+    e->pos.z = z;
+    enemies.push_back(e);
+}
+
+void _SceneJungle::updatePortals(float deltaT)
+{
+    for (int i = (int)portals.size() - 1; i >= 0; i--) {
+        portals[i].age += deltaT;
+
+        if (portals[i].age >= portals[i].lifetime) {
+            delete portals[i].sprite;
+            portals.erase(portals.begin() + i);
+        }
+    }
+}
+
+void _SceneJungle::updateEnemies(float deltaT)
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        enemies[i]->update(deltaT, player->pos);
+    }
+}
+
+void _SceneJungle::drawPortals()
+{
+    for (size_t i = 0; i < portals.size(); i++) {
+        if (portals[i].sprite) {
+            portals[i].sprite->drawSprite();
+        }
+    }
+}
+
+void _SceneJungle::drawEnemies()
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        enemies[i]->draw();
+    }
+}
+
+void _SceneJungle::separateEnemies()
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        for (size_t j = i + 1; j < enemies.size(); j++) {
+
+            _Enemy* a = enemies[i];
+            _Enemy* b = enemies[j];
+
+            if (!a->active || !b->active) {
+                continue;
+            }
+
+            if (myCollision->checkRadiusHit(a->pos, enemyRadius, b->pos, enemyRadius)) {
+
+                float dx = (float)(b->pos.x - a->pos.x);
+                float dz = (float)(b->pos.z - a->pos.z);
+
+                float distSq = dx * dx + dz * dz;
+
+                if (distSq <= 0.0001f) {
+                    a->pos.x += 0.1f;
+                    b->pos.x -= 0.1f;
+                    continue;
+                }
+
+                float dist = sqrtf(distSq);
+
+                float nx = dx / dist;
+                float nz = dz / dist;
+
+                float minDist = enemyRadius * 2.0f;
+                float overlap = minDist - dist;
+
+                a->pos.x -= nx * overlap * 0.5f;
+                a->pos.z -= nz * overlap * 0.5f;
+
+                b->pos.x += nx * overlap * 0.5f;
+                b->pos.z += nz * overlap * 0.5f;
+            }
+        }
+    }
+}
+
+void _SceneJungle::clearEnemies()
+{
+    for (size_t i = 0; i < enemies.size(); i++) {
+        delete enemies[i];
+    }
+
+    enemies.clear();
+}
+
+void _SceneJungle::clearPortals()
+{
+    for (size_t i = 0; i < portals.size(); i++) {
+        delete portals[i].sprite;
+        portals[i].sprite = nullptr;
+    }
+
+    portals.clear();
+}
+
+void _SceneJungle::removeDeadEnemies()
+{
+    for (int i = (int)enemies.size() - 1; i >= 0; i--) {
+        if (enemies[i]->dead) {
+            delete enemies[i];
+            enemies.erase(enemies.begin() + i);
+        }
+    }
+}
+
+void _SceneJungle::initMagicBullets()
+{
+    for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        magicBullets[i].initBlt(
+            player->pos,
+            "images/teapotT.jpg",   // bullet texture
+            "models/cube.obj",      // bullet model
+            "images/f.png"          // particle texture
+        );
+
+        magicBullets[i].scale.x = 0.4f;
+        magicBullets[i].scale.y = 0.4f;
+        magicBullets[i].scale.z = 0.4f;
+    }
+}
+
+_Enemy* _SceneJungle::findNearestEnemyInRange(float range)
+{
+    _Enemy* nearest = nullptr;
+    float bestDistSq = range * range;
+
+    for (size_t i = 0; i < enemies.size(); i++) {
+        _Enemy* enemy = enemies[i];
+
+        if (!enemy->active || enemy->dead) {
+            continue;
+        }
+
+        float dx = (float)(enemy->pos.x - player->pos.x);
+        float dz = (float)(enemy->pos.z - player->pos.z);
+
+        float distSq = dx * dx + dz * dz;
+
+        if (distSq < bestDistSq) {
+            bestDistSq = distSq;
+            nearest = enemy;
+        }
+    }
+
+    return nearest;
+}
+
+void _SceneJungle::updateAutoMagic(float deltaT)
+{
+    player->autoFireTimer += deltaT;
+
+    if (player->autoFireTimer < player->autoFireRate) {
+        return;
+    }
+
+    player->autoFireTimer = 0.0f;
+
+    _Enemy* target = findNearestEnemyInRange(player->autoFireRange);
+
+    if (!target) {
+        return;
+    }
+
+    _bullets& bullet = magicBullets[nextBulletIndex];
+
+    vec3 targetPos = target->pos;
+    targetPos.y += 1.0f;
+
+    // This is the code you asked about.
+    // It initializes the bullet shot.
+    bullet.start = player->pos;
+    bullet.start.y += 1.0f;
+
+    bullet.pos = bullet.start;
+    bullet.dest = targetPos;
+    bullet.t = 0.0f;
+    bullet.timer = 0.0f;
+    bullet.isLive = true;
+    bullet.actrigger = bullet.ACTIVE;
+
+    nextBulletIndex++;
+    nextBulletIndex = nextBulletIndex % MAX_MAGIC_BULLETS;
+}
+
+void _SceneJungle::updateMagicBullets(float deltaT)
+{
+    for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        _bullets& bullet = magicBullets[i];
+
+        if (bullet.actrigger == bullet.ACTIVE) {
+            bullet.isLive = true;
+            bullet.shoot(bullet.start, bullet.dest, deltaT);
+        }
+
+        if (!bullet.isLive) {
+            continue;
+        }
+
+        for (size_t j = 0; j < enemies.size(); j++) {
+            _Enemy* enemy = enemies[j];
+
+            if (!enemy->active || enemy->dead) {
+                continue;
+            }
+
+            if (myCollision->checkRadiusHit(bullet.pos, 0.6f, enemy->pos, enemyRadius)) {
+                enemy->takeDamage(player->bulletDamage);
+
+                bullet.actrigger = bullet.HIT;
+                bullet.isLive = false;
+
+                break;
+            }
+        }
+    }
+}
+
+void _SceneJungle::drawMagicBullets()
+{
+    for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        magicBullets[i].drawBullet();
+    }
+}
+// ======================================================
+// Input
+// ======================================================
 
 void _SceneJungle::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch(uMsg)
+    switch (uMsg)
     {
-    case WM_KEYDOWN:
-        switch (wParam)
-        {
-            case 'A':
-            case VK_LEFT:
-                if (currentPlayerLane > LEFT)
-                    currentPlayerLane = static_cast<Lane>(currentPlayerLane - 1);
-                break;
-            case 'D':
-            case VK_RIGHT:
-                if (currentPlayerLane < RIGHT)
-                    currentPlayerLane = static_cast<Lane>(currentPlayerLane + 1);
-                break;
-            case VK_RETURN:
-                if (gameOver){
-                    resetGame();
-                }
-                break;
-            case '0': // debug for checking scene change
-            case VK_ESCAPE:
-                    cout << "here" << endl;
-                    manager->requestSceneChange(new _MenuScene());
-                break;
-            default:
-                break;
-        }
-        keyMS->wParam = wParam;
-        keyMS->keyPressed(testCube);
-        keyMS->keyPressed(box);
-        //keyMS->keyPressed(skyBox);
-        //keyMS->keyPressed(cam); // camera should be fixed
-        //keyMS->keyPressed(mySprite);
-        keyMS->keyPressed(mdl,mdlW);
-        break;
+        case WM_KEYDOWN:
+            switch (wParam)
+            {
+                case 'W':
+                case VK_UP:
+                    player->setMoveForward(true);
+                    break;
 
-    case WM_KEYUP:
-         //mySprite->actionTrigger = mySprite->STAND;
-         break;
+                case 'S':
+                case VK_DOWN:
+                    player->setMoveBackward(true);
+                    break;
 
-    case WM_LBUTTONDOWN:
-            // after game over
+                case 'A':
+                case VK_LEFT:
+                    player->setTurnRight(true);
+                    break;
+
+                case 'D':
+                case VK_RIGHT:
+                    player->setTurnLeft(true);
+                    break;
+
+                case VK_ESCAPE:
+                    if (manager) {
+                        manager->requestSceneChange(new _MenuScene());
+                    }
+                    break;
+                case 'P':
+                    paused = true;
+                case 'L':
+                    player->playerLives = 0;
+                default:
+                    break;
+            }
+            break;
+
+        case WM_KEYUP:
+            switch (wParam)
+            {
+                case 'W':
+                case VK_UP:
+                    player->setMoveForward(false);
+                    break;
+
+                case 'S':
+                case VK_DOWN:
+                    player->setMoveBackward(false);
+                    break;
+
+                case 'A':
+                case VK_LEFT:
+                    player->setTurnRight(false);
+                    break;
+
+                case 'D':
+                case VK_RIGHT:
+                    player->setTurnLeft(false);
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+        case WM_LBUTTONDOWN:
+            if(!gameOver || paused){
+                player->setAttack(true);
+            }
             if(gameOver){
                 float mouseX = (float)LOWORD(lParam);
                 float mouseY = (float)HIWORD(lParam);
 
                 vec3 posExitPanel = exitPanel->pos;
-                vec3 posPlayPanel = playAgainPanel->pos;
+                vec3 posPlayAgainPanel = playAgainPanel->pos;
+                vec3 posMenuPanel = menuPanel->pos;
+                vec3 posHelpPanel = helpPanel->pos;
 
-                float left   = posExitPanel.x - exitPanel->width * 0.5f;
-                float right  = posExitPanel.x + exitPanel->width * 0.5f;
-                float top    = posExitPanel.y - exitPanel->height * 0.5f;
-                float bottom = posExitPanel.y + exitPanel->height * 0.5f;
+                float leftExit   = posExitPanel.x - exitPanel->width * 0.5f;
+                float rightExit  = posExitPanel.x + exitPanel->width * 0.5f;
+                float topExit    = posExitPanel.y - exitPanel->height * 0.5f;
+                float bottomExit = posExitPanel.y + exitPanel->height * 0.5f;
 
-                float left2   = posPlayPanel.x - playAgainPanel->width * 0.5f;
-                float right2  = posPlayPanel.x + playAgainPanel->width * 0.5f;
-                float top2    = posPlayPanel.y - playAgainPanel->height * 0.5f;
-                float bottom2 = posPlayPanel.y + playAgainPanel->height * 0.5f;
+                float leftPlay   = posPlayAgainPanel.x - playAgainPanel->width * 0.5f;
+                float rightPlay  = posPlayAgainPanel.x + playAgainPanel->width * 0.5f;
+                float topPlay    = posPlayAgainPanel.y - playAgainPanel->height * 0.5f;
+                float bottomPlay = posPlayAgainPanel.y + playAgainPanel->height * 0.5f;
 
-                if(mouseX >= left2 && mouseX <= right2 && mouseY >= top2  && mouseY <= bottom2){
+                if (mouseX >= leftPlay && mouseX <= rightPlay &&
+                    mouseY >= topPlay && mouseY <= bottomPlay)
+                {
                     resetGame();
                 }
-                if(mouseX >= left && mouseX <= right && mouseY >= top  && mouseY <= bottom){
+                else if (mouseX >= leftExit && mouseX <= rightExit &&
+                         mouseY >= topExit && mouseY <= bottomExit)
+                {
                     manager->requestSceneChange(new _MenuScene());
                 }
             }
-    case WM_RBUTTONDOWN:
-         keyMS->wParam = wParam;
-         keyMS->mouseEvenDown(LOWORD(lParam),HIWORD(lParam));
+            // Copy this entire if statement.
+            if (paused){
+                float mouseX = (float)LOWORD(lParam);
+                float mouseY = (float)HIWORD(lParam);
 
-            blts[clickCount].shoot(mdl->pos,mouse,deltaT);
-            blts[clickCount].actionTrigger= blts[clickCount].ACTIVE;
+                vec3 posExitPanel = exitPanel->pos;
+                vec3 posPlayAgainPanel = playAgainPanel->pos;
+                vec3 posMenuPanel = menuPanel->pos;
+                vec3 posHelpPanel = helpPanel->pos;
 
-            clickCount++;
-            clickCount = (clickCount)%20;
+                float leftExit   = posExitPanel.x - exitPanel->width * 0.5f;
+                float rightExit  = posExitPanel.x + exitPanel->width * 0.5f;
+                float topExit    = posExitPanel.y - exitPanel->height * 0.5f;
+                float bottomExit = posExitPanel.y + exitPanel->height * 0.5f;
 
-      //      snds->playSounds("sounds/laser.mp3");`
-        break;
+                float leftPlay   = posPlayAgainPanel.x - playAgainPanel->width * 0.5f;
+                float rightPlay  = posPlayAgainPanel.x + playAgainPanel->width * 0.5f;
+                float topPlay    = posPlayAgainPanel.y - playAgainPanel->height * 0.5f;
+                float bottomPlay = posPlayAgainPanel.y + playAgainPanel->height * 0.5f;
 
-    case WM_MBUTTONDOWN: break;
-    case WM_LBUTTONUP:
-    case WM_RBUTTONUP:
-    case WM_MBUTTONUP:
-          keyMS->mouseUp();
-          break;
+                float leftMenu   = posMenuPanel.x - menuPanel->width * 0.5f;
+                float rightMenu  = posMenuPanel.x + menuPanel->width * 0.5f;
+                float topMenu    = posMenuPanel.y - menuPanel->height * 0.5f;
+                float bottomMenu  = posMenuPanel.y + menuPanel->height * 0.5f;
 
-    case WM_MOUSEMOVE:
-         //keyMS->mouseMove(skyBox,LOWORD(lParam),HIWORD(lParam));
-         //keyMS->mouseMove(testCube,LOWORD(lParam),HIWORD(lParam));
-         //keyMS->mouseMove(box,LOWORD(lParam),HIWORD(lParam));
-         //
-         break;
+                float leftHelp   = posHelpPanel.x - helpPanel->width * 0.5f;
+                float rightHelp  = posHelpPanel.x + helpPanel->width * 0.5f;
+                float topHelp    = posHelpPanel.y - helpPanel->height * 0.5f;
+                float bottomHelp  = posHelpPanel.y + helpPanel->height * 0.5f;
 
-    case WM_MOUSEWHEEL:
-        //keyMS->mouseWheel(testCube,(double)GET_WHEEL_DELTA_WPARAM(wParam));
-        keyMS->mouseWheel(box,(double)GET_WHEEL_DELTA_WPARAM(wParam));
-        keyMS->mouseWheel(cam,(double)GET_WHEEL_DELTA_WPARAM(wParam));
-        break;
-    }
-}
-
-// ======================================================
-// Game flow
-// ======================================================
-
-void _SceneJungle::resetGame()
-{
-    playerLives = 5;
-    coinCount = 0;
-    gameOver = false;
-    currentPlayerLane = MIDDLE;
-
-    for (int i = 0; i < NUM_ROAD_CHUNKS; i++) {
-        road[i]->pos.z = -(roadChunkLength * i);
-
-        if (i == 0 || i == 1) {
-            clearChunkObstacles(i);
-        } else {
-            generateChunkObstacles(i);
-        }
-
-        for (int row = 0; row < ROWS_PER_CHUNK; row++) {
-            for (int lane = 0; lane < LANES; lane++) {
-                obstacleHit[i][row][lane] = false;
-                coinCollected[i][row][lane] = false;
-            }
-        }
-    }
-}
-
-// ======================================================
-// Road / world update
-// ======================================================
-
-void _SceneJungle::roadChunk(float deltaT)
-{
-    float dz = _SceneJungle::speed * deltaT;
-
-    for (int i = 0; i < numRoadChunks; i++) {
-        road[i]->moveZ(dz);
-
-        if (road[i]->pos.z > _SceneJungle::recyclePoint) {
-            road[i]->moveZ(-_SceneJungle::totalLoopLength);
-
-            // new obstacle pattern for recycled chunk
-            generateChunkObstacles(i);
-            // clear hit flags
-            for (int row = 0; row < ROWS_PER_CHUNK; row++) {
-                for (int lane = 0; lane < LANES; lane++) {
-                    obstacleHit[i][row][lane] = false;
-                    coinCollected[i][row][lane] = false;
-                }
-            }
-        }
-        road[i]->drawModel();
-    }
-}
-
-// ======================================================
-// Obstacles
-// ======================================================
-
-void _SceneJungle::drawObstacles(int chunkIndex)
-{
-    float obstacleY = -0.4f;
-    float localRowZ[ROWS_PER_CHUNK] = { -12.0f, -4.0f, 4.0f, 12.0f };
-
-    for (int row = 0; row < ROWS_PER_CHUNK; row++) {
-        for (int lane = 0; lane < LANES; lane++) {
-            if (chunkObstacles[chunkIndex].grid[row][lane] == 1) {
-                box->pos.x = laneX[lane];
-                box->pos.y = obstacleY;
-                box->pos.z = road[chunkIndex]->pos.z + localRowZ[row];
-                glPushMatrix();
-                    box->drawModel();
-                    box->rot.y +=0.5;
-                    box->rot.x +=0.5;
-                glPopMatrix();
-                if (!obstacleHit[chunkIndex][row][lane] &&
-                    !gameOver &&
-                    myCollision->checkLaneHit(currentPlayerLane, lane, playerZ, box->pos.z, hitDistance))
+                if (mouseX >= leftPlay && mouseX <= rightPlay &&
+                    mouseY >= topPlay && mouseY <= bottomPlay)
                 {
-                    obstacleHit[chunkIndex][row][lane] = true;
-                    playerLives--;
-
-                    std::cout << "HIT! lives left = " << playerLives << std::endl;
-
-                    if (playerLives <= 0) {
-                        gameOver = true;
-                        std::cout << "GAME OVER" << std::endl;
-                    }
+                    //resetGame();
+                    paused = false;
+                }
+                else if (mouseX >= leftExit && mouseX <= rightExit &&
+                         mouseY >= topExit && mouseY <= bottomExit)
+                {
+                    PostQuitMessage(0);
+                    paused = false;
+                }
+                else if (mouseX >= leftMenu && mouseX <= rightMenu &&
+                         mouseY >= topMenu && mouseY <= bottomMenu)
+                {
+                    manager->requestSceneChange(new _MenuScene());
+                    paused = false;
+                }
+                else if (mouseX >= leftHelp && mouseX <= rightHelp &&
+                         mouseY >= topHelp && mouseY <= bottomHelp)
+                {
+                    manager->requestSceneChange(new _TutorialScene());
+                    paused = false;
                 }
             }
-        }
+            break;
+        case WM_RBUTTONDOWN:
+            break;
+        case WM_MBUTTONDOWN: break;
+        case WM_LBUTTONUP:
+            player->setAttack(false);
+            break;
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP:
+            break;
+        case WM_MOUSEMOVE:
+             break;
+        case WM_MOUSEWHEEL:
+            break;
+        default:
+            break;
     }
-}
-
-void _SceneJungle::drawCoins(int chunkIndex)
-{
-    float coinY = -0.2f;
-    float localRowZ[ROWS_PER_CHUNK] = { -12.0f, -8.0f, -4.0f, 4.0f, 8.0f, 12.0f };
-
-    for (int row = 0; row < ROWS_PER_CHUNK; row++) {
-        for (int lane = 0; lane < LANES; lane++) {
-            if (chunkObstacles[chunkIndex].grid[row][lane] == 2 &&
-                !coinCollected[chunkIndex][row][lane]) {
-
-                coinSprite->pos.x = laneX[lane];
-                coinSprite->pos.y = coinY;
-                coinSprite->pos.z = road[chunkIndex]->pos.z + localRowZ[row];
-
-                coinSprite->drawSprite();
-
-                if (myCollision->checkLaneHit(currentPlayerLane, lane, playerZ, coinSprite->pos.z, hitDistance)) {
-                    coinCollected[chunkIndex][row][lane] = true;
-                    coinCount++;
-                    std::cout << "Coins: " << coinCount << std::endl;
-                }
-            }
-        }
-    }
-}
-
-void _SceneJungle::generateChunkObstacles(int chunkIndex)
-{
-    clearChunkObstacles(chunkIndex);
-
-    for (int row = 0; row < ROWS_PER_CHUNK; row++) {
-        int lane = rand() % LANES;
-        int roll = rand() % 100;
-
-        if (roll < 45) {
-            chunkObstacles[chunkIndex].grid[row][lane] = 1; // obstacle
-        }
-        else if (roll < 75) {
-            chunkObstacles[chunkIndex].grid[row][lane] = 2; // coin
-        }
-    }
-}
-
-void _SceneJungle::clearChunkObstacles(int chunkIndex)
-{
-    for (int row = 0; row < ROWS_PER_CHUNK; row++) {
-        for (int lane = 0; lane < LANES; lane++) {
-            chunkObstacles[chunkIndex].grid[row][lane] = 0;
-        }
-    }
-}
-
-// ======================================================
-// Debug helpers
-// ======================================================
-
-void _SceneJungle::drawTestObstacles(int chunkIndex)
-{
-    // Height where the obstacle boxes will sit.
-    float obstacleY = -0.4f;
-
-    // These are the z positions of each logical obstacle row
-    // INSIDE one single road chunk.
-    // these are NOT world positions by themselves.
-    // They are local offsets relative to the center of the road chunk.
-    // Since one road chunk is length 30, its center covers:
-    // center - 15  to  center + 15
-    // So these rows are being placed inside that chunk at:
-    // -12, -4, +4, +12 from the chunk center.
-    // Then the actual obstacle z positions become:
-    //    row 0  -30 + (-12) = -42
-    //    row 1  -30 + (-4) = -34
-    //    row 2  -30 + 4 = -26
-    //    row 3  -30 + 12 = -18
-    float localRowZ[4] = { -12.0f, -4.0f, 4.0f, 12.0f };
-    // Loop through obstacle rows.
-    // In this test: 4 rows total.
-    for (int row = 0; row < 4; row++) {
-        // Loop through the 3 lanes:
-        // lane 0 = left x = -2.5
-        // lane 1 = middle x = 0
-        // lane 2 = right x = 2.5
-        for (int lane = 0; lane < 3; lane++) {
-            // testGrid[row][lane] tells us whether this cell should contain an obstacle box or not.
-            // 1 = place a box here
-            // 0 = leave this spot empty
-            // Example:
-            // if testGrid[0][1] == 1,
-            // then row 0, middle lane gets a box.
-            if (testGrid[row][lane] == 1) {
-                // Set the box x position based on which lane it belongs to.
-                // laneX[0] might be left lane x
-                // laneX[1] might be middle lane x
-                // laneX[2] might be right lane x
-                box->pos.x = laneX[lane];
-                box->pos.y = obstacleY;
-                // road[chunkIndex]->pos.z = the CENTER z position of the current road chunk
-                // localRowZ[row] = where inside that chunk this obstacle row should sit
-                // final obstacle z = chunk center z + local row offset
-                box->pos.z = road[chunkIndex]->pos.z + localRowZ[row];
-                box->drawModel();
-                if (chunkIndex == 0 && row == 0 && lane == 1) {
-                    std::cout << "road z: " << road[chunkIndex]->pos.z
-                              << " obstacle z: " << box->pos.z
-                              << " local offset: " << localRowZ[row]
-                              << std::endl;
-                }
-            }
-        }
-    }
-}
-
-void _SceneJungle::mouseMapping(int x, int y)
-{
-   GLint viewPort[4];      // for the window
-   GLdouble modelViewM[16]; // model and camera
-   GLdouble projectionM[16];// for the projectio
-   GLfloat winX,winY,winZ;  //mouse clicks
-
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelViewM);
-   glGetDoublev(GL_PROJECTION_MATRIX,projectionM);
-   glGetIntegerv(GL_VIEWPORT,viewPort);
-
-   winX = (GLfloat)x;
-   winY = (GLfloat)viewPort[3] -y;
-
-   glReadPixels(x,(int)winY,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&winZ);
-
-   gluUnProject(winX,winY,winZ,modelViewM,projectionM,viewPort,&mouse.x,&mouse.y,&mouse.z);
 }
 
 // ======================================================
@@ -586,18 +785,11 @@ void _SceneJungle::mouseMapping(int x, int y)
 
 void _SceneJungle::drawLivesHUD()
 {
-    for (int i = 0; i < playerLives; i++) {
-        heartIcon->pos.x = 30.0f + i * 45.0f;
+    for (int i = 0; i < player->playerLives; i++) {
+        heartIcon->pos.x = 30.0f + i * 60.0f;
         heartIcon->pos.y = 30.0f;
         heartIcon->draw(wWidth, wHeight);
     }
-}
-
-void _SceneJungle::drawCoinHUD()
-{
-    coinIcon->pos.x = 30.0f;
-    coinIcon->pos.y = 80.0f;
-    coinIcon->draw(wWidth, wHeight);
 }
 
 void _SceneJungle::drawGameOverHUD()
@@ -606,11 +798,118 @@ void _SceneJungle::drawGameOverHUD()
     gameOverPanel->pos.y = (wHeight / 2.0f) - (gameOverPanel->height / 2.0f);
     gameOverPanel->draw(wWidth, wHeight);
 
-    exitPanel->pos.x = (wWidth / 2.0f) +150.0f;
-    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) +300.0f;
+    exitPanel->pos.x = (wWidth / 2.0f) + 400.0f;
+    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) + 300.0f;
     exitPanel->draw(wWidth, wHeight);
 
-    playAgainPanel->pos.x = (wWidth / 2.0f) - 150.0f;
+    playAgainPanel->pos.x = (wWidth / 2.0f) - 400.0f;
     playAgainPanel->pos.y = ((wHeight / 2.0f) - (playAgainPanel->height / 2.0f)) +300.0f;
     playAgainPanel->draw(wWidth, wHeight);
+}
+
+void _SceneJungle::drawTimerHUD()
+{
+    int totalSeconds = (int)gameTimeRemaining;
+
+    int minutes = totalSeconds / 60;
+    int seconds = totalSeconds % 60;
+
+    char timerText[32];
+
+    sprintf(timerText, "SURVIVE: %d:%02d", minutes, seconds);
+
+    //many draws to make it look bold
+    drawText(wWidth/2, wHeight - 79.0f, timerText, 0.25f);
+    drawText(wWidth/2, wHeight - 80.0f, timerText, 0.25f);
+    drawText((wWidth/2)+1.0, wHeight - 80.0f, timerText, 0.25f);
+    drawText((wWidth/2)-1.0, wHeight - 80.0f, timerText, 0.25f);
+    drawText((wWidth/2)+1.0, wHeight - 79.0f, timerText, 0.25f);
+}
+
+void _SceneJungle::pausedHUD()
+{
+    pausedPanel->pos.x = wWidth / 2.0f;
+    pausedPanel->pos.y = (wHeight / 2.0f) - (pausedPanel->height / 2.0f);
+    pausedPanel->draw(wWidth, wHeight);
+
+    exitPanel->pos.x = (wWidth / 2.0f) + 600.0f;
+    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) + 300.0f;
+    exitPanel->draw(wWidth, wHeight);
+
+    playAgainPanel->pos.x = (wWidth / 2.0f) - 600.0f;
+    playAgainPanel->pos.y = ((wHeight / 2.0f) - (playAgainPanel->height / 2.0f)) +300.0f;
+    playAgainPanel->draw(wWidth, wHeight);
+
+    menuPanel->pos.x = (wWidth / 2.0f) + 200.0f;
+    menuPanel->pos.y = ((wHeight / 2.0f) - (menuPanel->height / 2.0f)) +300.0f;
+    menuPanel->draw(wWidth, wHeight);
+
+    helpPanel->pos.x = (wWidth / 2.0f) - 200.0f;
+    helpPanel->pos.y = ((wHeight / 2.0f) - (helpPanel->height / 2.0f)) +300.0f;
+    helpPanel->draw(wWidth, wHeight);
+}
+
+void _SceneJungle::resetGame()
+{
+    player->playerLives = 5;
+    player->setDeath(false);
+    player->setAttack(false);
+
+    gameOver = false;
+    paused = false;
+
+    gameTimeRemaining = 300.0f;
+    deathAnimationPeriod = 3.0f;
+    enemyDamageCooldown = 0.0f;
+
+    player->pos.x = 0.0f;
+    player->pos.y = 0.0f;
+    player->pos.z = 0.0f;
+    player->yaw = 0.0f;
+
+    clearEnemies();
+    clearPortals();
+
+    // Optional: spawn a starter enemy again
+    spawnPortals(0.0f, 0.0f, -20.0f, 1);
+    spawnEnemy(0.0f, 0.0f, -20.0f, dragonknight);
+
+    cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
+}
+
+void _SceneJungle::drawText(float x, float y, const char* text, float scale)
+{
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    gluOrtho2D(0, wWidth, 0, wHeight);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glTranslatef(x, y, 0.0f);
+    glScalef(scale, scale, 1.0f);
+
+    for (int i = 0; text[i] != '\0'; i++) {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, text[i]);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
 }

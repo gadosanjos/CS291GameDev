@@ -14,20 +14,28 @@
 #include <math.h>
 #include <chrono>
 
+#include <vector>
+
+#include <fstream>
+#include <sstream>
+
 #define PI 3.14159
 #define GLEW_STATIC
+
+#define MAX_PARTICLES 5000
 
 using namespace std;
 
 typedef struct{
-   GLdouble x;
-   GLdouble y;
-   GLdouble z;
+   double x;
+   double y;
+   double z;
 }vec3;
 
-typedef struct{
-   GLdouble x;
-   GLdouble y;
-}vec2;
+// --- Data Structures ---
+struct vec4 { float x, y, z, w; };
+struct vec2 { float u, v; };
+struct vec2f { double x, y; };
+struct faces { int v, t, n; }; // Stores indices for Position, Texture, and Normal
 
 #endif // _COMMON_H

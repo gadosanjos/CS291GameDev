@@ -15,8 +15,8 @@ _camera::_camera()
     up.y = 1;
 
     step = 1.5;
-    theta.x =0; // yaw
-    theta.y =0; // pitch
+    theta.u =0; // yaw
+    theta.v =0; // pitch
 
     distance = sqrt(pow(eye.x-dest.x,2) +
                     pow(eye.y-dest.y,2) +
@@ -36,8 +36,8 @@ void _camera::camReset()
 void _camera::camRotX()
 {
     // Convert to radians
-    float yawRad = theta.x * (float)PI / 180.0f;
-    float pitchRad = theta.y * (float)PI / 180.0f;
+    float yawRad = theta.u * (float)PI / 180.0f;
+    float pitchRad = theta.v * (float)PI / 180.0f;
 
     // Forward direction (from yaw + pitch)
     float fx = cosf(pitchRad) * sinf(yawRad);

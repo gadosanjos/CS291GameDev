@@ -8,7 +8,7 @@ _ModelLoaderMD2::_ModelLoaderMD2()
 {
     pos.x = 0.0f;
     pos.y = 0.0f;
-    pos.z = -100.0f;
+    pos.z = 0.0f;
 
     scale.x = 0.25f;
     scale.y = 0.25f;
@@ -291,7 +291,7 @@ void _ModelLoaderMD2::actions()
             break;
 
         case ATTACK:
-            setAnimationRange(46, 53, false);
+            setAnimationRange(46, 53, true);
             break;
 
         case PAIN1:

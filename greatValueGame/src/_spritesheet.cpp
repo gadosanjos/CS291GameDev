@@ -27,8 +27,8 @@ _spritesheet::~_spritesheet()
 void _spritesheet::spriteInit(char* fileName, int xFrames, int yFrames)
 {
     sprite->loadTexture(fileName);
-    frames.x = xFrames;
-    frames.y = yFrames;
+    frames.u = xFrames;
+    frames.v = yFrames;
 }
 
 void _spritesheet::drawSprite()
@@ -68,19 +68,19 @@ void _spritesheet::spriteActions(float deltaT)
     {
     case STAND:
         xMin = 0;
-        yMin = 2.0/frames.y;
-        xMax = 1.0/frames.x;
-        yMax = 3.0/frames.y;
+        yMin = 2.0/frames.v;
+        xMax = 1.0/frames.u;
+        yMax = 3.0/frames.v;
         break;
     case WALKLEFT:
         if (timer > 0.08f) {
-            xMin += 1.0f / frames.x;
+            xMin += 1.0f / frames.u;
 
             if (xMin >= 1.0f) {
                 xMin = 0.0f;
             }
 
-            xMax = xMin + (1.0f / frames.x);
+            xMax = xMin + (1.0f / frames.u);
             yMin = 0.0f;
             yMax = 1.0f;
 
@@ -89,28 +89,28 @@ void _spritesheet::spriteActions(float deltaT)
         break;
     case WALKRIGHT:
         if(timer > 0.08){
-            xMin += 1.0/frames.x;
-            yMin = 3/frames.y;
-            xMax += 1.0/frames.x;
+            xMin += 1.0/frames.u;
+            yMin = 3/frames.v;
+            xMax += 1.0/frames.u;
             yMax = 1.0;
             timer = 0;
         }
         break;
     case WALKFRONT:
         if(timer > 2){
-            xMin += 1.0/frames.x;
+            xMin += 1.0/frames.u;
             yMin = 0;
-            xMax += 1.0/frames.x;
-            yMax = 1.0/frames.y;
+            xMax += 1.0/frames.u;
+            yMax = 1.0/frames.v;
             timer = 0;
         }
         break;
     case WALKBACK:
         if(timer > 0.08){
-            xMin += 1.0/frames.x;
-            yMin = 2.0/frames.y;
-            xMax += 1.0/frames.x;
-            yMax = 3.0/frames.y;
+            xMin += 1.0/frames.u;
+            yMin = 2.0/frames.v;
+            xMax += 1.0/frames.u;
+            yMax = 3.0/frames.v;
             timer = 0;
         }
         break;

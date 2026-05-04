@@ -31,6 +31,10 @@ public:
     // State
     int playerLives = 5;
     enum STATE {IDLE,RUN ,ATTACK, JUMP};
+    float autoFireTimer = 0.0f;
+    float autoFireRate = 1.0f;
+    float autoFireRange = 25.0f;
+    int bulletDamage = 1;
 
     _ModelLoaderMD2* model = new _ModelLoaderMD2();
     _ModelLoaderMD2* modelWeapon = new _ModelLoaderMD2(); // waepon

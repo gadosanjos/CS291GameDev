@@ -3,6 +3,7 @@
 #include "_menuscene.h"
 #include "_tutorialscene.h"
 #include "_pausedscene.h"
+#include "_scenejungle.h"
 #include <cmath>
 
 // ======================================================
@@ -109,6 +110,10 @@ GLint _Scene::initGL()
     worldGround->pos.y = -1.0f;
     worldGround->pos.z = 0.0f;
 
+    // magic bullets / auto attack
+    initMagicBullets();
+
+
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
     //player->playerLives = 0; // game over debug
     return true;
@@ -152,8 +157,12 @@ void _Scene::drawScene()
 
         if (gameTimeRemaining <= 0.0f) {
             gameTimeRemaining = 0.0f;
-            gameOver = true;
+            gameWin = true;
         }
+    }
+
+    if(gameWin){
+        manager->requestSceneChange(new _SceneJungle());
     }
 
     // --------------------------------------
@@ -191,7 +200,7 @@ void _Scene::drawScene()
             return;
         }
     } else if(player->playerLives >= 10){
-        manager->requestSceneChange(new _SceneVirtualWorld());
+        manager->requestSceneChange(new _SceneJungle());
     }
     if(paused){
         pausedHUD();
@@ -205,6 +214,13 @@ void _Scene::drawScene()
     updatePortals(deltaT);
     updateEnemies(deltaT);
     separateEnemies();
+
+    checkEnemyPlayerDamage(deltaT);
+
+    updateAutoMagic(deltaT);
+    updateMagicBullets(deltaT);
+    removeDeadEnemies();
+
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
 
     // --------------------------------------
@@ -214,19 +230,66 @@ void _Scene::drawScene()
     player->draw();
     drawPortals();
     drawEnemies();
+    drawMagicBullets();
 }
 
 // ======================================================
 // Scene helpers
 // ======================================================
 
-void _Scene::drawWorld()
-{
+void _Scene::drawWorld(){
     glPushMatrix();
         worldGround->drawModel();
         drawLivesHUD();
         drawTimerHUD();
     glPopMatrix();
+}
+
+void _Scene::checkEnemyPlayerDamage(float deltaT){
+    // If player is already dead or game is paused, do not apply damage.
+    if (gameOver || paused) {
+        return;
+    }
+
+    // Cooldown prevents damage every single frame.
+    if (enemyDamageCooldown > 0.0f) {
+        enemyDamageCooldown -= deltaT;
+    }
+
+    // If still cooling down, no new damage this frame.
+    if (enemyDamageCooldown > 0.0f) {
+        return;
+    }
+
+    for (size_t i = 0; i < enemies.size(); i++) {
+        _Enemy* enemy = enemies[i];
+
+        if (!enemy->active || enemy->dead) {
+            continue;
+        }
+
+        bool touchingPlayer = myCollision->checkRadiusHit(
+            player->pos,
+            playerHitRadius,
+            enemy->pos,
+            enemyAttackRadius
+        );
+
+        if (touchingPlayer) {
+            player->playerLives -= enemyContactDamage;
+
+            if (player->playerLives < 0) {
+                player->playerLives = 0;
+            }
+
+            enemyDamageCooldown = enemyDamageCooldownTime;
+
+            cout << "Player hit by enemy! Lives: "
+                 << player->playerLives << endl;
+
+            break;
+        }
+    }
 }
 
 // ======================================================
@@ -407,6 +470,135 @@ void _Scene::clearPortals()
     }
 
     portals.clear();
+}
+
+void _Scene::removeDeadEnemies()
+{
+    for (int i = (int)enemies.size() - 1; i >= 0; i--) {
+        if (enemies[i]->dead) {
+            delete enemies[i];
+            enemies.erase(enemies.begin() + i);
+        }
+    }
+}
+
+void _Scene::initMagicBullets()
+{
+    for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        magicBullets[i].initBlt(
+            player->pos,
+            "images/teapotT.jpg",   // bullet texture
+            "models/cube.obj",      // bullet model
+            "images/f.png"          // particle texture
+        );
+
+        magicBullets[i].scale.x = 0.4f;
+        magicBullets[i].scale.y = 0.4f;
+        magicBullets[i].scale.z = 0.4f;
+    }
+}
+
+_Enemy* _Scene::findNearestEnemyInRange(float range)
+{
+    _Enemy* nearest = nullptr;
+    float bestDistSq = range * range;
+
+    for (size_t i = 0; i < enemies.size(); i++) {
+        _Enemy* enemy = enemies[i];
+
+        if (!enemy->active || enemy->dead) {
+            continue;
+        }
+
+        float dx = (float)(enemy->pos.x - player->pos.x);
+        float dz = (float)(enemy->pos.z - player->pos.z);
+
+        float distSq = dx * dx + dz * dz;
+
+        if (distSq < bestDistSq) {
+            bestDistSq = distSq;
+            nearest = enemy;
+        }
+    }
+
+    return nearest;
+}
+
+void _Scene::updateAutoMagic(float deltaT)
+{
+    player->autoFireTimer += deltaT;
+
+    if (player->autoFireTimer < player->autoFireRate) {
+        return;
+    }
+
+    player->autoFireTimer = 0.0f;
+
+    _Enemy* target = findNearestEnemyInRange(player->autoFireRange);
+
+    if (!target) {
+        return;
+    }
+
+    _bullets& bullet = magicBullets[nextBulletIndex];
+
+    vec3 targetPos = target->pos;
+    targetPos.y += 1.0f;
+
+    // This is the code you asked about.
+    // It initializes the bullet shot.
+    bullet.start = player->pos;
+    bullet.start.y += 1.0f;
+
+    bullet.pos = bullet.start;
+    bullet.dest = targetPos;
+    bullet.t = 0.0f;
+    bullet.timer = 0.0f;
+    bullet.isLive = true;
+    bullet.actrigger = bullet.ACTIVE;
+
+    nextBulletIndex++;
+    nextBulletIndex = nextBulletIndex % MAX_MAGIC_BULLETS;
+}
+
+void _Scene::updateMagicBullets(float deltaT)
+{
+    for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        _bullets& bullet = magicBullets[i];
+
+        if (bullet.actrigger == bullet.ACTIVE) {
+            bullet.isLive = true;
+            bullet.shoot(bullet.start, bullet.dest, deltaT);
+        }
+
+        if (!bullet.isLive) {
+            continue;
+        }
+
+        for (size_t j = 0; j < enemies.size(); j++) {
+            _Enemy* enemy = enemies[j];
+
+            if (!enemy->active || enemy->dead) {
+                continue;
+            }
+
+            if (myCollision->checkRadiusHit(bullet.pos, 0.6f, enemy->pos, enemyRadius)) {
+                enemy->takeDamage(player->bulletDamage);
+
+                bullet.actrigger = bullet.HIT;
+                bullet.isLive = false;
+
+                break;
+            }
+        }
+    }
+}
+
+void _Scene::drawMagicBullets()
+{
+    for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        magicBullets[i].drawBullet();
+    }
 }
 // ======================================================
 // Input
@@ -669,6 +861,7 @@ void _Scene::resetGame()
 
     gameTimeRemaining = 300.0f;
     deathAnimationPeriod = 3.0f;
+    enemyDamageCooldown = 0.0f;
 
     player->pos.x = 0.0f;
     player->pos.y = 0.0f;

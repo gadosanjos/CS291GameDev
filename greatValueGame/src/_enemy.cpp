@@ -100,3 +100,23 @@ void _Enemy::draw()
         modelWeapon->Draw();
     glPopMatrix();
 }
+
+void _Enemy::setHealth(int amount)
+{
+    health = amount;
+}
+
+void _Enemy::takeDamage(int amount)
+{
+    if (dead) return;
+
+    health -= amount;
+
+    if (health <= 0) {
+        health = 0;
+        dead = true;
+        active = false;
+    }
+}
+
+
