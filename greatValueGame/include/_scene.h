@@ -104,7 +104,7 @@ public:
     int enemyContactDamage = 1;
     float deathAnimationPeriod = 3.0f;
     float enemyRadius = 0.5f;
-    float gameTimeRemaining = 10.0f; // 5 minutes in seconds
+    float gameTimeRemaining = 120.0f; // 5 minutes in seconds
     bool gameOver = false;
     bool gameWin = false;
     bool paused = false;

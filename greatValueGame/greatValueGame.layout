@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
-	<ActiveTarget name="Debug" />
-	<File name="src\_camera.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="576" topLine="3" />
-		</Cursor>
-	</File>
-	<File name="src\_bullets.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="89" topLine="76" />
-		</Cursor>
-	</File>
-	<File name="src\_spritesheet.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="923" topLine="23" />
-		</Cursor>
-	</File>
+	<ActiveTarget name="Release" />
 	<File name="include\_modelvbo.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="426" topLine="13" />
-		</Cursor>
-	</File>
-	<File name="include\_common.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="580" topLine="3" />
 		</Cursor>
 	</File>
 	<File name="src\_hudicon.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -32,41 +12,84 @@
 			<Cursor1 position="0" topLine="11" />
 		</Cursor>
 	</File>
+	<File name="include\_ground.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="6" />
+		</Cursor>
+	</File>
+	<File name="src\_texloader.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="305" topLine="56" />
+		</Cursor>
+	</File>
+	<File name="include\_particles.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="803" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\_bullets.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2519" topLine="80" />
+		</Cursor>
+	</File>
+	<File name="src\_pausedscene.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="include\_scenedungeon.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3268" topLine="81" />
+		</Cursor>
+	</File>
+	<File name="src\scenemanager.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="517" topLine="2" />
+		</Cursor>
+	</File>
+	<File name="include\_quad.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="65" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\_scenedungeon.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="17292" topLine="585" />
+		</Cursor>
+	</File>
 	<File name="src\_collision.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="423" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\_scene.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include\_camera.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4836" topLine="143" />
+			<Cursor1 position="822" topLine="0" />
 		</Cursor>
-		<Folding>
-			<Collapse line="13" />
-			<Collapse line="18" />
-			<Collapse line="239" />
-			<Collapse line="247" />
-			<Collapse line="298" />
-			<Collapse line="322" />
-			<Collapse line="346" />
-			<Collapse line="378" />
-			<Collapse line="390" />
-			<Collapse line="397" />
-			<Collapse line="406" />
-			<Collapse line="413" />
-			<Collapse line="456" />
-			<Collapse line="465" />
-			<Collapse line="475" />
-			<Collapse line="485" />
-			<Collapse line="501" />
-			<Collapse line="527" />
-			<Collapse line="564" />
-			<Collapse line="782" />
-		</Folding>
 	</File>
-	<File name="src\_particles.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\_menuscene.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2146" topLine="57" />
+			<Cursor1 position="4028" topLine="105" />
+		</Cursor>
+	</File>
+	<File name="include\_pausedscene.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1256" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="include\_enemy.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="399" topLine="7" />
+		</Cursor>
+	</File>
+	<File name="include\_scene.h" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3173" topLine="73" />
+		</Cursor>
+	</File>
+	<File name="src\_landingscene.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="821" topLine="21" />
 		</Cursor>
 	</File>
 	<File name="include\_collision.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -74,9 +97,138 @@
 			<Cursor1 position="66" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src\scenemanager.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\_inputs.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="517" topLine="2" />
+			<Cursor1 position="4627" topLine="106" />
+		</Cursor>
+	</File>
+	<File name="src\_modelvbo.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1418" topLine="39" />
+		</Cursor>
+	</File>
+	<File name="src\_ModelLoaderMD2.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8622" topLine="339" />
+		</Cursor>
+	</File>
+	<File name="include\_common.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="580" topLine="3" />
+		</Cursor>
+	</File>
+	<File name="src\_quad.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1774" topLine="30" />
+		</Cursor>
+	</File>
+	<File name="include\scenemanager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="134" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\_particles.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2146" topLine="57" />
+		</Cursor>
+	</File>
+	<File name="src\_skybox.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="175" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\_camera.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="576" topLine="3" />
+		</Cursor>
+	</File>
+	<File name="src\_scene.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16685" topLine="285" />
+		</Cursor>
+		<Folding>
+			<Collapse line="13" />
+			<Collapse line="18" />
+			<Collapse line="244" />
+			<Collapse line="252" />
+			<Collapse line="303" />
+			<Collapse line="327" />
+			<Collapse line="351" />
+			<Collapse line="383" />
+			<Collapse line="395" />
+			<Collapse line="402" />
+			<Collapse line="411" />
+			<Collapse line="418" />
+			<Collapse line="461" />
+			<Collapse line="470" />
+			<Collapse line="480" />
+			<Collapse line="490" />
+			<Collapse line="506" />
+			<Collapse line="532" />
+			<Collapse line="615" />
+			<Collapse line="821" />
+			<Collapse line="830" />
+			<Collapse line="845" />
+			<Collapse line="860" />
+			<Collapse line="879" />
+			<Collapse line="930" />
+		</Folding>
+	</File>
+	<File name="main.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9104" topLine="262" />
+		</Cursor>
+	</File>
+	<File name="include\_bullets.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="487" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="include\_scenejungle.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3263" topLine="72" />
+		</Cursor>
+	</File>
+	<File name="src\_tutorialscene.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="667" topLine="18" />
+		</Cursor>
+	</File>
+	<File name="src\_scenejungle.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="17057" topLine="129" />
+		</Cursor>
+		<Folding>
+			<Collapse line="13" />
+			<Collapse line="18" />
+			<Collapse line="36" />
+			<Collapse line="129" />
+			<Collapse line="146" />
+			<Collapse line="244" />
+			<Collapse line="252" />
+			<Collapse line="303" />
+			<Collapse line="327" />
+			<Collapse line="351" />
+			<Collapse line="383" />
+			<Collapse line="395" />
+			<Collapse line="402" />
+			<Collapse line="411" />
+			<Collapse line="418" />
+			<Collapse line="461" />
+			<Collapse line="470" />
+			<Collapse line="480" />
+			<Collapse line="490" />
+			<Collapse line="506" />
+		</Folding>
+	</File>
+	<File name="src\_enemy.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2208" topLine="82" />
+		</Cursor>
+	</File>
+	<File name="include\_player.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="766" topLine="22" />
 		</Cursor>
 	</File>
 	<File name="src\_player.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -95,29 +247,9 @@
 			<Collapse line="123" />
 		</Folding>
 	</File>
-	<File name="src\_tutorialscene.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\_ground.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="667" topLine="18" />
-		</Cursor>
-	</File>
-	<File name="src\_enemy.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2208" topLine="82" />
-		</Cursor>
-	</File>
-	<File name="include\_player.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="766" topLine="22" />
-		</Cursor>
-	</File>
-	<File name="main.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9104" topLine="262" />
-		</Cursor>
-	</File>
-	<File name="src\_texloader.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="305" topLine="56" />
+			<Cursor1 position="153" topLine="6" />
 		</Cursor>
 	</File>
 	<File name="include\_ModelLoaderMD2.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -125,99 +257,14 @@
 			<Cursor1 position="4658" topLine="98" />
 		</Cursor>
 	</File>
-	<File name="src\_ModelLoaderMD2.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\_spritesheet.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8622" topLine="339" />
-		</Cursor>
-	</File>
-	<File name="src\_skybox.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="175" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include\_quad.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="65" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src\_quad.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1774" topLine="30" />
-		</Cursor>
-	</File>
-	<File name="include\_scene.h" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3052" topLine="87" />
-		</Cursor>
-	</File>
-	<File name="include\_camera.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="822" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include\_ground.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="6" />
-		</Cursor>
-	</File>
-	<File name="src\_landingscene.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="821" topLine="21" />
-		</Cursor>
-	</File>
-	<File name="src\_ground.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="153" topLine="6" />
-		</Cursor>
-	</File>
-	<File name="src\_pausedscene.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include\_enemy.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="399" topLine="7" />
-		</Cursor>
-	</File>
-	<File name="src\_modelvbo.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1418" topLine="39" />
-		</Cursor>
-	</File>
-	<File name="include\_pausedscene.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1256" topLine="0" />
+			<Cursor1 position="923" topLine="23" />
 		</Cursor>
 	</File>
 	<File name="include\_texloader.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="414" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="include\_bullets.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="437" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src\_inputs.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4627" topLine="106" />
-		</Cursor>
-	</File>
-	<File name="include\_particles.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="803" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src\_menuscene.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4028" topLine="105" />
-		</Cursor>
-	</File>
-	<File name="include\_scenejungle.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3198" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

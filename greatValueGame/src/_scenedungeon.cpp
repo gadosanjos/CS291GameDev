@@ -353,13 +353,13 @@ void _SceneDungeon::spawnEnemy(float x, float y, float z, int mobSelection)
     _Enemy* e = new _Enemy();
     switch(mobSelection){
         case dragonknight:
-            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_armour.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/knight.pcx");
+            e->init("models/wolves/werewolf1/tris.md2", "models/wolves/werewolf1/rage.pcx", "models/wolves/werewolf1/weapon.md2", "models/wolves/werewolf1/rage.pcx");
             break;
         case knight:
-            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_green.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/knight.pcx");
+            e->init("models/wolves/wolf/tris.md2", "models/wolves/wolf/Anya.pcx", "models/wolves/wolf/w_bfg.md2", "models/wolves/wolf/W_bfg.pcx");
             break;
         case zealot:
-            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_yellow.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/knight.pcx");
+            e->init("models/tekk-blade/tris.md2", "models/tekk-blade/blade_blue.pcx", "models/tekk-blade/weapon.md2", "models/tekk-blade/blade_blue.pcx");
             break;
         case werewolf1:
             e->init("models/wolves/werewolf1/tris.md2", "models/wolves/werewolf1/rage.pcx", "models/wolves/werewolf1/weapon.md2", "models/wolves/werewolf1/rage.pcx");
@@ -592,6 +592,8 @@ void _SceneDungeon::updateMagicBullets(float deltaT)
 
                 bullet.actrigger = bullet.HIT;
                 bullet.isLive = false;
+                bullet.explosionGenerated = false;
+                bullet.explosionTimer = 0.0f;
 
                 break;
             }
@@ -602,6 +604,7 @@ void _SceneDungeon::updateMagicBullets(float deltaT)
 void _SceneDungeon::drawMagicBullets()
 {
     for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        magicBullets[i].bulletActions();
         magicBullets[i].drawBullet();
     }
 }

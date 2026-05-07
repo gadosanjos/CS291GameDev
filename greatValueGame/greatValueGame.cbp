@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/greatValueGame" prefix_auto="1" extension_auto="1" />
+				<Option output="../RELEASE/greatValueGame" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="C:/Users/dosan/Desktop/GradLevel/2-Spring 2026/CS291/project/CS291GameDev/common/bin" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
@@ -69,6 +69,7 @@
 		<Unit filename="include/_player.h" />
 		<Unit filename="include/_quad.h" />
 		<Unit filename="include/_scene.h" />
+		<Unit filename="include/_scenedungeon.h" />
 		<Unit filename="include/_scenejungle.h" />
 		<Unit filename="include/_skybox.h" />
 		<Unit filename="include/_sounds.h" />
@@ -97,6 +98,7 @@
 		<Unit filename="src/_player.cpp" />
 		<Unit filename="src/_quad.cpp" />
 		<Unit filename="src/_scene.cpp" />
+		<Unit filename="src/_scenedungeon.cpp" />
 		<Unit filename="src/_scenejungle.cpp" />
 		<Unit filename="src/_skybox.cpp" />
 		<Unit filename="src/_sounds.cpp" />

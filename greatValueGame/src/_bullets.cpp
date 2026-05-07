@@ -24,6 +24,10 @@ _bullets::_bullets()
     timer = 0.0f;
     deltaT = 0.0f;
     t = 0.0f;
+
+    explosionTimer = 0.0f;
+    explosionDuration = 0.6f;
+    explosionGenerated = false;
 }
 
 _bullets::~_bullets()
@@ -74,18 +78,42 @@ void _bullets::shoot(vec3 sPos, vec3 dPos, float time)
 
 void _bullets::bulletActions()
 {
-   switch(actrigger)
-   {
-       case IDLE: isLive = false; // avoid render
+    switch (actrigger)
+    {
+        case IDLE:
+            isLive = false;
             break;
-       case ACTIVE: isLive = true;
+
+        case ACTIVE:
+            isLive = true;
             break;
-       case HIT: isLive = false;
-             p->generateP(pos.x,pos.y,pos.z);
-             p->lifetime(deltaT);
-             p->drawParticle();
-       break;
-   }
+
+        case HIT:
+            isLive = false;
+
+            // Generate the explosion only once.
+            if (!explosionGenerated) {
+                p->generateP(pos.x, pos.y, pos.z);
+                explosionGenerated = true;
+                explosionTimer = 0.0f;
+            }
+
+            // Keep updating/drawing particles for a short time.
+            explosionTimer += deltaT;
+            p->lifetime(deltaT);
+            p->drawParticle();
+
+            // After the explosion duration ends, return bullet to IDLE.
+            if (explosionTimer >= explosionDuration) {
+                actrigger = IDLE;
+                explosionGenerated = false;
+                explosionTimer = 0.0f;
+                t = 0.0f;
+                timer = 0.0f;
+            }
+
+            break;
+    }
 }
 
 bool _bullets::collision(vec3 s, vec3 d)

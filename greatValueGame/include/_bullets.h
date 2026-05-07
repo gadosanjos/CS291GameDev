@@ -16,6 +16,11 @@ class _bullets : public _modelVBO
         float timer;
         float deltaT=0;
         float t =0; //parametric factor
+
+        float explosionTimer = 0.0f;
+        float explosionDuration = 0.6f;
+        bool explosionGenerated = false;
+
         vec3 dest; // destination of the bullet move
         vec3 start;
 

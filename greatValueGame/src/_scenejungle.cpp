@@ -592,6 +592,8 @@ void _SceneJungle::updateMagicBullets(float deltaT)
 
                 bullet.actrigger = bullet.HIT;
                 bullet.isLive = false;
+                bullet.explosionGenerated = false;
+                bullet.explosionTimer = 0.0f;
 
                 break;
             }
@@ -602,6 +604,7 @@ void _SceneJungle::updateMagicBullets(float deltaT)
 void _SceneJungle::drawMagicBullets()
 {
     for (int i = 0; i < MAX_MAGIC_BULLETS; i++) {
+        magicBullets[i].bulletActions();
         magicBullets[i].drawBullet();
     }
 }
