@@ -14,7 +14,6 @@ Win32/
 *.exe
 *.out
 *.o
-*.obj
 
 # IDE / generated metadata
 *.depend

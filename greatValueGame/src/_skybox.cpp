@@ -9,8 +9,9 @@ _skyBox::_skyBox()
     scale.x=1000;
     scale.y=700;
     scale.z=1000;
-    pos.x=pos.y=0;
-    pos.z =10;
+    pos.x=0;
+    pos.y=-5.0;
+    pos.z =0;
 }
 
 _skyBox::~_skyBox()

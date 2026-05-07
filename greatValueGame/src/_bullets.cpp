@@ -2,9 +2,9 @@
 
 _bullets::_bullets()
 {
-    scale.x = 2.0;
-    scale.y = 2.0;
-    scale.z = 2.0;
+    scale.x = 0.25;
+    scale.y = 0.25;
+    scale.z = 0.25;
 
     pos.x = 0.0;
     pos.y = 0.0;

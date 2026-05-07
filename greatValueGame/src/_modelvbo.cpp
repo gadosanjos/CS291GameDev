@@ -49,7 +49,8 @@ void _modelVBO::drawModel()
        glRotatef(rot.y,0,1,0);
        glRotatef(rot.z,0,0,1);
 
-       glScalef(scale.x,scale.y,scale.z);
+       glScalef(0.1,0.1,0.1);
+       myTex->BindTex();
 
      glEnableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, vboVert);

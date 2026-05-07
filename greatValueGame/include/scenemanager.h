@@ -5,7 +5,6 @@
 #include "iscene.h"
 #include "_scene.h"
 #include "_landingscene.h"
-#include "_scenevirtualworld.h"
 #include "_scenejungle.h"
 
 class SceneManager

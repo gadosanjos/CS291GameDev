@@ -4,6 +4,7 @@
 #include "_tutorialscene.h"
 #include "_pausedscene.h"
 #include <cmath>
+#include "_scenedungeon.h"
 
 // ======================================================
 // Construction / destruction
@@ -56,12 +57,12 @@ GLint _SceneJungle::initGL()
 
     // skybox
     skyBox->boxInit();
-    skyBox->myTex[0].loadTexture("images/back.bmp");
-    skyBox->myTex[1].loadTexture("images/front.bmp");
-    skyBox->myTex[2].loadTexture("images/top.bmp");
-    skyBox->myTex[3].loadTexture("images/bottom.bmp");
-    skyBox->myTex[4].loadTexture("images/left.bmp");
-    skyBox->myTex[5].loadTexture("images/right.bmp");
+    skyBox->myTex[0].loadTexture("images/ProjectSkyboxes/Field_Box_Back.png");
+    skyBox->myTex[1].loadTexture("images/ProjectSkyboxes/Field_Box_Front.png");
+    skyBox->myTex[2].loadTexture("images/ProjectSkyboxes/Field_Box_Top.png");
+    skyBox->myTex[3].loadTexture("images/ProjectSkyboxes/Field_Box_Bottom.png");
+    skyBox->myTex[4].loadTexture("images/ProjectSkyboxes/Field_Box_Left.png");
+    skyBox->myTex[5].loadTexture("images/ProjectSkyboxes/Field_Box_Right.png");
     // HUD
     heartIcon->initIcon("images/heart.png");
     heartIcon->width = 60.0f;
@@ -69,7 +70,7 @@ GLint _SceneJungle::initGL()
     gameOverPanel->initIcon("images/menu/gameover.png");
     gameOverPanel->width = 1000.0f;
     gameOverPanel->height = 520.0f;
-    pausedPanel->initIcon("images/menu/gameover.png");
+    pausedPanel->initIcon("images/menu/paused.png");
     pausedPanel->width = 1000.0f;
     pausedPanel->height = 520.0f;
     playAgainPanel->initIcon("images/menu/newgame.png");
@@ -84,9 +85,15 @@ GLint _SceneJungle::initGL()
     exitPanel->initIcon("images/menu/exit.png");
     exitPanel->width = 500.0f;
     exitPanel->height = 300.0f;
+    gameWinPanel->initIcon("images/transition/lvl2complete.png");
+    gameWinPanel->width = 1000.0f;
+    gameWinPanel->height = 520.0f;
+    playNextPanel->initIcon("images/transition/nextlevel.png");
+    playNextPanel->width = 500.0f;
+    playNextPanel->height = 300.0f;
 
     // player model
-    player->init("models/tekk-blade/tris.md2", "models/tekk-blade/blade_green.pcx", "models/tekk-blade/weapon.md2", "models/tekk-blade/blade_yellow.pcx");
+    player->init("models/doomguy/tris.md2", "models/doomguy/camo.pcx", "models/doomguy/w_shotgun.md2", "models/doomguy/w_shotgun.pcx");
     player->pos.x = 0.0f;
     player->pos.y = 0.0f;
     player->pos.z = 0.0f;
@@ -102,19 +109,20 @@ GLint _SceneJungle::initGL()
     //spawnEnemy(-30.0f, 0.0f, -20.0f, wolf);
 
     // world ground
-    worldGround->modelInit("images/jungleScene/jungle_road.png");
-    worldGround->scale.x = 100.0f;
-    worldGround->scale.z = 100.0f;
+    worldGround->modelInit("images/fieldtexture.png");
+    worldGround->scale.x = 1000.0f;
+    worldGround->scale.z = 1000.0f;
     worldGround->pos.x = 0.0f;
-    worldGround->pos.y = -1.0f;
+    worldGround->pos.y = -2.0f;
     worldGround->pos.z = 0.0f;
 
     // magic bullets / auto attack
     initMagicBullets();
+    paused = true;
 
 
     cam->followTarget(player->pos, player->yaw, camFollowDistance, camHeight, camLookHeight);
-    //player->playerLives = 0; // game over debug
+    //player->playerLives = 10000; // game over debug
     return true;
 }
 
@@ -149,19 +157,15 @@ void _SceneJungle::drawScene()
     // update game timer
     if (!gameOver) {
         if(paused){
-            //
+            //return;
         } else {
             gameTimeRemaining -= deltaT;
         }
 
         if (gameTimeRemaining <= 0.0f) {
             gameTimeRemaining = 0.0f;
-            gameOver = true;
+            gameWin = true;
         }
-    }
-
-    if(gameWin){
-        //manager->requestSceneChange(new _SceneJungle());
     }
 
     // --------------------------------------
@@ -191,6 +195,10 @@ void _SceneJungle::drawScene()
         player->setDeath(true);
         gameOver = true;
     }
+    if(paused){
+        pausedHUD();
+        return;
+    }
     if(gameOver){
         deathAnimationPeriod -= deltaT;
         if(deathAnimationPeriod <= 0){
@@ -198,11 +206,9 @@ void _SceneJungle::drawScene()
             drawGameOverHUD();
             return;
         }
-    } else if(player->playerLives >= 10){
-        //manager->requestSceneChange(new _SceneJungleVirtualWorld());
     }
-    if(paused){
-        pausedHUD();
+    if(gameWin){
+        drawGameWinHUD();
         return;
     }
     if(enemies.size() < 10){
@@ -308,10 +314,10 @@ void _SceneJungle::randomizeEnemySpawnPositions(vec3 playerPos, int distanceRang
     if(timeRemaining <= 60.0f){
         spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
         spawnEnemy(spawnX/2, 0.0f, spawnZ, dragonknight);
-    } else if (timeRemaining <= 120.f){
+    } else if (timeRemaining <= 90.f){
         spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
         spawnEnemy(spawnX/2, 0.0f, spawnZ, zealot);
-    } else if (timeRemaining <= 180.f){
+    } else if (timeRemaining <= 110.f){
         spawnPortals(spawnX/2, 0.0f, spawnZ-1, 1);
         spawnEnemy(spawnX/2, 0.0f, spawnZ, werewolf1);
     }
@@ -347,13 +353,13 @@ void _SceneJungle::spawnEnemy(float x, float y, float z, int mobSelection)
     _Enemy* e = new _Enemy();
     switch(mobSelection){
         case dragonknight:
-            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_ogre.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/dragon_ogre.pcx");
+            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_armour.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/knight.pcx");
             break;
         case knight:
-            e->init("models/knight/tris.md2", "models/knight/BS.pcx", "models/knight/weapon.md2", "models/knight/BS.pcx");
+            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_green.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/knight.pcx");
             break;
         case zealot:
-            e->init("models/zealot/tris.md2", "models/zealot/Ctf_b.PCX", "models/zealot/weapon.md2", "models/zealot/Ctf_r.PCX");
+            e->init("models/dragonknight/tris.md2", "models/dragonknight/dragon_yellow.pcx", "models/dragonknight/weapon.md2", "models/dragonknight/knight.pcx");
             break;
         case werewolf1:
             e->init("models/wolves/werewolf1/tris.md2", "models/wolves/werewolf1/rage.pcx", "models/wolves/werewolf1/weapon.md2", "models/wolves/werewolf1/rage.pcx");
@@ -637,6 +643,7 @@ void _SceneJungle::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     break;
                 case 'P':
                     paused = true;
+                    break;
                 case 'L':
                     player->playerLives = 0;
                 default:
@@ -672,9 +679,6 @@ void _SceneJungle::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             break;
         case WM_LBUTTONDOWN:
-            if(!gameOver || paused){
-                player->setAttack(true);
-            }
             if(gameOver){
                 float mouseX = (float)LOWORD(lParam);
                 float mouseY = (float)HIWORD(lParam);
@@ -705,7 +709,36 @@ void _SceneJungle::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     manager->requestSceneChange(new _MenuScene());
                 }
             }
-            // Copy this entire if statement.
+            if(gameWin){
+                float mouseX = (float)LOWORD(lParam);
+                float mouseY = (float)HIWORD(lParam);
+
+                vec3 posExitPanel = exitPanel->pos;
+                vec3 posPlayAgainPanel = playNextPanel->pos;
+                vec3 posMenuPanel = menuPanel->pos;
+                vec3 posHelpPanel = helpPanel->pos;
+
+                float leftExit   = posExitPanel.x - exitPanel->width * 0.5f;
+                float rightExit  = posExitPanel.x + exitPanel->width * 0.5f;
+                float topExit    = posExitPanel.y - exitPanel->height * 0.5f;
+                float bottomExit = posExitPanel.y + exitPanel->height * 0.5f;
+
+                float leftPlay   = posPlayAgainPanel.x - playAgainPanel->width * 0.5f;
+                float rightPlay  = posPlayAgainPanel.x + playAgainPanel->width * 0.5f;
+                float topPlay    = posPlayAgainPanel.y - playAgainPanel->height * 0.5f;
+                float bottomPlay = posPlayAgainPanel.y + playAgainPanel->height * 0.5f;
+
+                if (mouseX >= leftPlay && mouseX <= rightPlay &&
+                    mouseY >= topPlay && mouseY <= bottomPlay)
+                {
+                    manager->requestSceneChange(new _SceneDungeon());
+                }
+                else if (mouseX >= leftExit && mouseX <= rightExit &&
+                         mouseY >= topExit && mouseY <= bottomExit)
+                {
+                    PostQuitMessage(0);
+                }
+            }
             if (paused){
                 float mouseX = (float)LOWORD(lParam);
                 float mouseY = (float)HIWORD(lParam);
@@ -738,7 +771,6 @@ void _SceneJungle::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 if (mouseX >= leftPlay && mouseX <= rightPlay &&
                     mouseY >= topPlay && mouseY <= bottomPlay)
                 {
-                    //resetGame();
                     paused = false;
                 }
                 else if (mouseX >= leftExit && mouseX <= rightExit &&
@@ -807,6 +839,21 @@ void _SceneJungle::drawGameOverHUD()
     playAgainPanel->draw(wWidth, wHeight);
 }
 
+void _SceneJungle::drawGameWinHUD()
+{
+    gameWinPanel->pos.x = wWidth / 2.0f;
+    gameWinPanel->pos.y = (wHeight / 2.0f) - (gameOverPanel->height / 2.0f);
+    gameWinPanel->draw(wWidth, wHeight);
+
+    exitPanel->pos.x = (wWidth / 2.0f) + 400.0f;
+    exitPanel->pos.y = ((wHeight / 2.0f) - (exitPanel->height / 2.0f)) + 300.0f;
+    exitPanel->draw(wWidth, wHeight);
+
+    playNextPanel->pos.x = (wWidth / 2.0f) - 400.0f;
+    playNextPanel->pos.y = ((wHeight / 2.0f) - (playAgainPanel->height / 2.0f)) +300.0f;
+    playNextPanel->draw(wWidth, wHeight);
+}
+
 void _SceneJungle::drawTimerHUD()
 {
     int totalSeconds = (int)gameTimeRemaining;
@@ -819,11 +866,11 @@ void _SceneJungle::drawTimerHUD()
     sprintf(timerText, "SURVIVE: %d:%02d", minutes, seconds);
 
     //many draws to make it look bold
-    drawText(wWidth/2, wHeight - 79.0f, timerText, 0.25f);
-    drawText(wWidth/2, wHeight - 80.0f, timerText, 0.25f);
-    drawText((wWidth/2)+1.0, wHeight - 80.0f, timerText, 0.25f);
-    drawText((wWidth/2)-1.0, wHeight - 80.0f, timerText, 0.25f);
-    drawText((wWidth/2)+1.0, wHeight - 79.0f, timerText, 0.25f);
+    drawText(125.0+(wWidth/4), wHeight - 84.0f, timerText, 0.8f);
+    drawText(125.0+(wWidth/4), wHeight - 85.0f, timerText, 0.8f);
+    drawText(125.0+(wWidth/4)+1.0, wHeight - 85.0f, timerText, 0.8f);
+    drawText(125.0+(wWidth/4)-1.0, wHeight - 85.0f, timerText, 0.8f);
+    drawText(125.0+(wWidth/4)+1.0, wHeight - 84.0f, timerText, 0.8f);
 }
 
 void _SceneJungle::pausedHUD()
@@ -858,7 +905,7 @@ void _SceneJungle::resetGame()
     gameOver = false;
     paused = false;
 
-    gameTimeRemaining = 300.0f;
+    gameTimeRemaining = 120.0f;
     deathAnimationPeriod = 3.0f;
     enemyDamageCooldown = 0.0f;
 

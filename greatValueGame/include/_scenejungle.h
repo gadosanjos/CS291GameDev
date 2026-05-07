@@ -32,6 +32,7 @@ public:
     void drawWorld();
     void drawLivesHUD();
     void drawGameOverHUD();
+    void drawGameWinHUD();
     void pausedHUD();
     void drawTimerHUD();
     void resetGame();
@@ -82,7 +83,9 @@ public:
     // HUD
     _hudIcon* heartIcon = new _hudIcon();
     _hudIcon* gameOverPanel = new _hudIcon();
+    _hudIcon* gameWinPanel = new _hudIcon();
     _hudIcon* playAgainPanel = new _hudIcon();
+    _hudIcon* playNextPanel = new _hudIcon();
     _hudIcon* exitPanel = new _hudIcon();
     _hudIcon* menuPanel = new _hudIcon();
     _hudIcon* helpPanel = new _hudIcon();
@@ -101,7 +104,7 @@ public:
     int enemyContactDamage = 1;
     float deathAnimationPeriod = 3.0f;
     float enemyRadius = 0.5f;
-    float gameTimeRemaining = 300.0f; // 5 minutes in seconds
+    float gameTimeRemaining = 10.0f; // 5 minutes in seconds
     bool gameOver = false;
     bool gameWin = false;
     bool paused = false;

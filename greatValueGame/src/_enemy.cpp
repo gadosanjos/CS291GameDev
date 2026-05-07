@@ -91,6 +91,7 @@ void _Enemy::draw()
         glRotatef(-90, 1, 0, 0);
         glRotatef(90, 0, 0, 1);
         glScalef(0.03f, 0.03f, 0.03f);
+        glScalef(2,2,2);
 
         model->actions();
         model->Draw();

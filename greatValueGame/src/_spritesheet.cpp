@@ -40,6 +40,7 @@ void _spritesheet::drawSprite()
         glRotatef(rot.y,0,1,0);
         glRotatef(rot.z,0,0,1);
         glScalef(scale.x,scale.y,scale.z);
+        glScalef(2,2,2);
 
         sprite->BindTex();
 
